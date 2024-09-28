@@ -17,7 +17,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} min-h-screen flex flex-col`}>
-        <header className="bg-gray-100 p-4">Chat</header>
         <div className="grid grid-cols-12 flex-1">
           <aside className="bg-gray-800 text-white p-4 col-span-2">
             foo

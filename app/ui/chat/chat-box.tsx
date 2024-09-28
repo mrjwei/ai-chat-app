@@ -11,13 +11,17 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition"
 import Button from "@/app/ui/common/button"
-import { MessagesContext } from "@/app/lib/contexts"
+import { CurrentThreadContext } from "@/app/lib/contexts"
 import { sendMessage } from "@/app/lib/api"
 
 export default function ChatBox() {
   const [status, setStatus] = useState("idle")
   const [textareaValue, setTextareaValue] = useState("")
-  const { messages, setMessages } = useContext(MessagesContext)
+  const { thread, setThread } = useContext(CurrentThreadContext)
+
+  if (!thread) {
+    return
+  }
 
   const { transcript, resetTranscript, listening } = useSpeechRecognition()
 
@@ -46,13 +50,19 @@ export default function ChatBox() {
 
   const handleSend = async () => {
     if (textareaValue) {
-      setMessages([...messages, { role: "user", content: textareaValue }])
+      setThread({
+        ...thread,
+        messages: [...thread.messages, { role: "user", content: textareaValue }]
+      })
       const response = await sendMessage(textareaValue)
-      setMessages([
-        ...messages,
-        { role: "user", content: textareaValue },
-        { role: "bot", content: response },
-      ])
+      setThread({
+        ...thread,
+        messages: [
+          ...thread.messages,
+          { role: "user", content: textareaValue },
+          { role: "bot", content: response },
+        ]
+      })
       const utterance = new SpeechSynthesisUtterance(response)
       utterance.lang = "en-GB"
       utterance.voice = window.speechSynthesis.getVoices()[8]
