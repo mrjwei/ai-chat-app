@@ -1,7 +1,11 @@
 import {createContext} from 'react'
-import { TMessagesContext } from "@/app/lib/types"
+import { TCurrentThreadContext } from "@/app/lib/types"
 
-export const MessagesContext = createContext<TMessagesContext>({
-  messages: [],
-  setMessages: () => {}
+export const CurrentThreadContext = createContext<TCurrentThreadContext>({
+  thread: {
+    id: '',
+    title: '',
+    messages: []
+  },
+  setThread: () => {}
 })

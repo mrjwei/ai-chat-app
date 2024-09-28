@@ -1,11 +1,19 @@
 import {useContext} from 'react'
 import clsx from "clsx"
-import {MessagesContext} from '@/app/lib/contexts'
+import {CurrentThreadContext} from '@/app/lib/contexts'
 import {IMessage} from '@/app/lib/types'
 import Message from '@/app/ui/chat/message'
 
 export default function Messages() {
-  const {messages} = useContext(MessagesContext)
+  const {thread} = useContext(CurrentThreadContext)
+
+  let messages: IMessage[]
+
+  if (!thread) {
+    messages = []
+  } else {
+    messages = thread.messages
+  }
 
   return (
     <div className="flex-1 bg-white overflow-y-scroll p-8 grid grid-cols-12">

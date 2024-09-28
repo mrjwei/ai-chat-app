@@ -1,7 +1,8 @@
+'use server'
+
 import axios from 'axios'
-import {unstable_noStore as noStore} from 'next/cache'
-import {Db} from 'mongodb'
 import clientPromise from '@/app/lib/mongodb'
+import {unstable_noStore as noStore} from 'next/cache'
 import { IThread } from "@/app/lib/types"
 
 const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
@@ -33,47 +34,26 @@ export const sendMessage = async (msg: string) => {
   }
 }
 
-export const fetchThread = async (title: string) => {
+export const fetchThreadByTitle = async (title: string) => {
   noStore()
   const client = await clientPromise
-  const db: Db = client.db('conversation-data')
+  const db = client.db('conversation-data')
   try {
-    const results = await db.collection('threads').findOne({
-      title
-    })
-    if (results) {
-      return results[0]
-    }
-    return null
+    const collection = db.collection('threads')
+    return await collection.findOne({title})
   } catch (error) {
-    console.error('Failed to create thread: ', error)
+    console.error('Failed to find thread: ', error)
   }
 }
 
 export const createThread = async (thread: IThread) => {
   noStore()
   const client = await clientPromise
-  const db: Db = client.db('conversation-data')
+  const db = client.db('conversation-data')
   try {
     const collection = db.collection('threads')
     await collection.insertOne(thread)
   } catch (error) {
-    console.error('Failed to create thread: ', error)
-  }
-}
-
-export const updateThread = async (title: string, updatedThread: IThread) => {
-  noStore()
-  const client = await clientPromise
-  const db: Db = client.db('conversation-data')
-  try {
-    const collection = db.collection('threads')
-    await collection.updateOne({title}, {
-      $set: {
-        ...updatedThread
-      }
-    })
-  } catch (error) {
-    console.error('Failed to update thread: ', error)
+    console.error('Failed to create design: ', error)
   }
 }

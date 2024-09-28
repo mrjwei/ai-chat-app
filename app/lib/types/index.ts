@@ -3,7 +3,14 @@ export interface IMessage {
   content: string
 }
 
-export type TMessagesContext = {
+export interface IThread {
+  id: string
+  title: string
+  description?: string
   messages: IMessage[]
-  setMessages: (messages: IMessage[]) => void
+}
+
+export type TCurrentThreadContext = {
+  thread?: IThread
+  setThread: (thread: IThread) => void
 }
