@@ -1,11 +1,8 @@
-import {useContext} from 'react'
 import clsx from "clsx"
-import {CurrentThreadContext} from '@/app/lib/contexts'
-import {IMessage} from '@/app/lib/types'
+import {IMessage, IThread} from '@/app/lib/types'
 import Message from '@/app/ui/chat/message'
 
-export default function Messages() {
-  const {thread} = useContext(CurrentThreadContext)
+export default function Messages({thread}: {thread: any}) {
 
   let messages: IMessage[]
 

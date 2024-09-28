@@ -1,5 +1,6 @@
 "use client"
 
+import "regenerator-runtime/runtime"
 import { useContext, useState } from "react"
 import {
   PlayCircleIcon,

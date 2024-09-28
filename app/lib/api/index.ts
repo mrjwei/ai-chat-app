@@ -34,13 +34,26 @@ export const sendMessage = async (msg: string) => {
   }
 }
 
-export const fetchThreadByTitle = async (title: string) => {
+export const fetchThreadById = async (id: string) => {
   noStore()
   const client = await clientPromise
   const db = client.db('conversation-data')
   try {
     const collection = db.collection('threads')
-    return await collection.findOne({title})
+    const results = await collection.find({id}).toArray()
+    return results[0]
+  } catch (error) {
+    console.error('Failed to find thread: ', error)
+  }
+}
+
+export const fetchThreads = async () => {
+  noStore()
+  const client = await clientPromise
+  const db = client.db('conversation-data')
+  try {
+    const collection = db.collection('threads')
+    return await collection.find({}).toArray()
   } catch (error) {
     console.error('Failed to find thread: ', error)
   }
@@ -53,6 +66,22 @@ export const createThread = async (thread: IThread) => {
   try {
     const collection = db.collection('threads')
     await collection.insertOne(thread)
+  } catch (error) {
+    console.error('Failed to create design: ', error)
+  }
+}
+
+export const updateThread = async (id: string, updatedThread: IThread) => {
+  noStore()
+  const client = await clientPromise
+  const db = client.db('conversation-data')
+  try {
+    const collection = db.collection('threads')
+    await collection.updateOne({id}, {
+      $set: {
+        ...updatedThread
+      }
+    })
   } catch (error) {
     console.error('Failed to create design: ', error)
   }
