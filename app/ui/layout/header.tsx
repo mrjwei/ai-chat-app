@@ -1,16 +1,15 @@
-import { updateThread } from "@/app/lib/api"
-import { IThread } from "@/app/lib/types"
-import Button from "@/app/ui/common/button"
+import Link from "next/link"
+import {
+  PlusIcon
+} from '@heroicons/react/24/outline'
 
-export default async function Header({updatedThread}: {updatedThread: IThread}) {
-  const updateThreadWithData = updateThread.bind(null, updatedThread.id, updatedThread)
+export default async function Header() {
   return (
     <header className="bg-gray-100 p-4">
-      <form action={updateThreadWithData}>
-        <Button type="submit">
-          Save
-        </Button>
-      </form>
+      <Link href='/' className="flex items-center">
+        <PlusIcon className="w-5 mr-1" />
+        <span>New Chat</span>
+      </Link>
     </header>
   )
 }

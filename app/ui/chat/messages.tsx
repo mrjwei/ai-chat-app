@@ -17,7 +17,7 @@ export default function Messages({thread}: {thread: any}) {
       <div className="col-span-8 col-start-3">
         {messages.map((message: IMessage, i: number) => {
           return (
-            <div className={clsx(
+            <div key={message.content} className={clsx(
               'w-full flex mb-8',
               {
                 'justify-end': message.role === 'user',

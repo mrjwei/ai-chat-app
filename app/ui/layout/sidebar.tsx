@@ -1,5 +1,9 @@
-import { fetchThreads } from "@/app/lib/api"
 import Link from "next/link"
+import {
+  PlusIcon
+} from '@heroicons/react/24/outline'
+import { fetchThreads } from "@/app/lib/api"
+import ChatList from '@/app/ui/layout/chat-list'
 
 export default async function Sidebar() {
   let threads = await fetchThreads()
@@ -7,18 +11,12 @@ export default async function Sidebar() {
     threads = []
   }
   return (
-    <aside className="bg-gray-800 text-white p-4 col-span-2">
-      <ul>
-        {threads.map(thread => {
-          return (
-            <li>
-              <Link href={`/t/${thread.id}`} className="block w-full whitespace-nowrap overflow-hidden text-ellipsis">
-                {thread.title}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
+    <aside className="bg-gray-800 text-white col-span-2 relative">
+      <Link href='/' className="flex items-center border-b-2 border-neutral-600 p-4 mb-4">
+        <PlusIcon className="w-5 mr-1" />
+        <span>New Chat</span>
+      </Link>
+      <ChatList threads={threads} />
     </aside>
   )
 }
