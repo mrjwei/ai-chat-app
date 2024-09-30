@@ -1,7 +1,8 @@
 "use client"
 
 import "regenerator-runtime/runtime"
-import { useContext, useState } from "react"
+import {v4 as uuidv4} from 'uuid'
+import { useState } from "react"
 import {
   PlayCircleIcon,
   StopCircleIcon,
@@ -12,17 +13,12 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition"
 import Button from "@/app/ui/common/button"
-import { CurrentThreadContext } from "@/app/lib/contexts"
-import { sendMessage } from "@/app/lib/api"
+import { sendMessage, createThread, updateThread } from "@/app/lib/api"
+import { TRole, IThread } from "@/app/lib/types"
 
-export default function ChatBox() {
+export default function ChatBox({thread}: {thread: IThread | null}) {
   const [status, setStatus] = useState("idle")
   const [textareaValue, setTextareaValue] = useState("")
-  const { thread, setThread } = useContext(CurrentThreadContext)
-
-  if (!thread) {
-    return
-  }
 
   const { transcript, resetTranscript, listening } = useSpeechRecognition()
 
@@ -51,19 +47,43 @@ export default function ChatBox() {
 
   const handleSend = async () => {
     if (textareaValue) {
-      setThread({
-        ...thread,
-        messages: [...thread.messages, { role: "user", content: textareaValue }]
-      })
       const response = await sendMessage(textareaValue)
-      setThread({
-        ...thread,
-        messages: [
-          ...thread.messages,
-          { role: "user", content: textareaValue },
-          { role: "bot", content: response },
-        ]
-      })
+
+      if (thread === null) {
+        const newThread = {
+          id: uuidv4(),
+          title: 'Untitled',
+          description: '',
+          messages: [
+            {
+              role: 'user' as TRole,
+              content: textareaValue
+            },
+            {
+              role: 'bot' as TRole,
+              content: response
+            }
+          ]
+        }
+        await createThread(newThread)
+      } else {
+        const updatedThread = {
+          ...thread,
+          messages: [
+            ...thread.messages,
+            {
+              role: 'user' as TRole,
+              content: textareaValue
+            },
+            {
+              role: 'bot' as TRole,
+              content: response
+            }
+          ]
+        }
+        await updateThread(thread.id, updatedThread)
+      }
+
       const utterance = new SpeechSynthesisUtterance(response)
       utterance.lang = "en-GB"
       utterance.voice = window.speechSynthesis.getVoices()[8]

@@ -1,12 +1,14 @@
+export type TRole = 'user' | 'system' | 'bot'
+
 export interface IMessage {
-  role: 'user' | 'system' | 'bot'
+  role: TRole
   content: string
 }
 
 export interface IThread {
   id: string
   title: string
-  description?: string
+  description: string
   messages: IMessage[]
 }
 

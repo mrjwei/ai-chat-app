@@ -1,6 +1,8 @@
 'use server'
 
 import axios from 'axios'
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 import clientPromise from '@/app/lib/mongodb'
 import {unstable_noStore as noStore} from 'next/cache'
 import { IThread } from "@/app/lib/types"
@@ -40,7 +42,10 @@ export const fetchThreadById = async (id: string) => {
   const db = client.db('conversation-data')
   try {
     const collection = db.collection('threads')
-    const results = await collection.find({id}).toArray()
+    const results = (await collection.find({id}).toArray()).map(doc => {
+      const {id, title, description, messages} = doc
+      return {id, title, description, messages}
+    })
     return results[0]
   } catch (error) {
     console.error('Failed to find thread: ', error)
@@ -69,6 +74,8 @@ export const createThread = async (thread: IThread) => {
   } catch (error) {
     console.error('Failed to create design: ', error)
   }
+  revalidatePath(`/t/${thread.id}`)
+  redirect(`/t/${thread.id}`)
 }
 
 export const updateThread = async (id: string, updatedThread: IThread) => {
@@ -85,4 +92,5 @@ export const updateThread = async (id: string, updatedThread: IThread) => {
   } catch (error) {
     console.error('Failed to create design: ', error)
   }
+  revalidatePath(`/t/${id}`)
 }

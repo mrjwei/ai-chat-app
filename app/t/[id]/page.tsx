@@ -5,12 +5,12 @@ import Messages from "@/app/ui/chat/messages"
 
 export default async function Page({params}: {params: {id: string}}) {
   const id = params.id
-  const thread = await fetchThreadById(id)
+  const thread = await fetchThreadById(id) as IThread
 
   return (
     <>
       <Messages thread={thread} />
-      <ChatBox />
+      <ChatBox thread={thread} />
     </>
   )
 }
