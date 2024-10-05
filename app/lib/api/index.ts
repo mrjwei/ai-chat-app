@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 import clientPromise from '@/app/lib/mongodb'
 import {unstable_noStore as noStore} from 'next/cache'
 import { IThread } from "@/app/lib/types"
+import {signIn as authSignIn, signOut as authSignOut} from '@/auth'
 
 const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
 
@@ -109,4 +110,31 @@ export const deleteThread = async (id: string) => {
     console.error('Failed to create design: ', error)
   }
   revalidatePath('/')
+}
+
+export const fetchUserByEmail = async (email: string) => {
+  noStore()
+  const client = await clientPromise
+  const db = client.db('conversation-data')
+  try {
+    const collection = db.collection('users')
+    return (await collection.find({email}).toArray()).map(doc => {
+      const {email, password} = doc
+      return {email, password}
+    })[0]
+  } catch (error) {
+    console.error('Failed to fetch user: ', error)
+  }
+}
+
+export const signIn = async (prevState: any, formData: FormData) => {
+  await authSignIn("credentials", {
+    email: formData.get("email"),
+    password: formData.get("password"),
+    redirectTo: "/",
+  })
+}
+
+export const signOut = async () => {
+  await authSignOut({redirectTo: '/login'})
 }
