@@ -3,6 +3,7 @@
 import axios from 'axios'
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { ObjectId } from "mongodb"
 import clientPromise from '@/app/lib/mongodb'
 import {unstable_noStore as noStore} from 'next/cache'
 import { IThread } from "@/app/lib/types"
@@ -53,15 +54,14 @@ export const fetchThreadById = async (id: string) => {
   }
 }
 
-export const fetchThreads = async () => {
+export const fetchThreads = async (userId: string) => {
   noStore()
   const client = await clientPromise
   const db = client.db('conversation-data')
   try {
-    const collection = db.collection('threads')
-    return (await collection.find({}).toArray()).map(doc => {
-      const {id, title, description, messages} = doc
-      return {id, title, description, messages}
+    return (await db.collection('threads').find({userId: new ObjectId(userId)}).toArray()).map(doc => {
+      const {_id, userId, title, description, messages} = doc
+      return {id: String(_id), userId, title, description, messages}
     })
   } catch (error) {
     console.error('Failed to find thread: ', error)
@@ -117,10 +117,9 @@ export const fetchUserByEmail = async (email: string) => {
   const client = await clientPromise
   const db = client.db('conversation-data')
   try {
-    const collection = db.collection('users')
-    return (await collection.find({email}).toArray()).map(doc => {
-      const {email, password} = doc
-      return {email, password}
+    return (await db.collection('users').find({email}).toArray()).map(doc => {
+      const {_id, name, email, password} = doc
+      return {id: String(_id), name, email, password}
     })[0]
   } catch (error) {
     console.error('Failed to fetch user: ', error)

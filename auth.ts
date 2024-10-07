@@ -3,7 +3,7 @@ import type {User} from 'next-auth'
 import { authConfig } from './auth.config';
 import Credentials from 'next-auth/providers/credentials'
 import { z } from 'zod'
-// import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt'
 import {fetchUserByEmail} from '@/app/lib/api'
 
 export const { auth, signIn, signOut } = NextAuth({
@@ -23,9 +23,9 @@ export const { auth, signIn, signOut } = NextAuth({
           if (!user) {
             return null
           }
-          const passwordsMatch = password === user.password
+          const passwordsMatch = password === user.password || await bcrypt.compare(password, user.password)
           if (passwordsMatch) {
-            return user as User
+            return user
           }
         }
         console.log('Invalid user')

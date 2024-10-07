@@ -10,7 +10,7 @@ export const authConfig = {
   callbacks: {
     async jwt({user, token, trigger}) {
       if ((trigger === "update" && user) || user) {
-        token.id = String(user._id)
+        token.id = user.id
         token.name = user.name
         token.email = user.email
       }
