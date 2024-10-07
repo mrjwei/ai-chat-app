@@ -16,8 +16,7 @@ export default async function Sidebar() {
   }
 
   const threads = await fetchThreads(session.user.id!) as IThread[]
-  console.log(session.user.id)
-  console.log(JSON.stringify(threads))
+
   return (
     <aside className="bg-gray-800 text-white col-span-2 sticky top-0 h-screen flex flex-col justify-between">
       <div className="">
