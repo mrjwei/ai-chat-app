@@ -43,10 +43,9 @@ export const fetchThreadById = async (id: string) => {
   const client = await clientPromise
   const db = client.db('conversation-data')
   try {
-    const collection = db.collection('threads')
-    const results = (await collection.find({id}).toArray()).map(doc => {
-      const {id, title, description, messages} = doc
-      return {id, title, description, messages}
+    const results = (await db.collection('threads').find({_id: new ObjectId(id)}).toArray()).map(doc => {
+      const {_id, title, description, messages} = doc
+      return {id: String(_id), title, description, messages}
     })
     return results[0]
   } catch (error) {
@@ -61,25 +60,26 @@ export const fetchThreads = async (userId: string) => {
   try {
     return (await db.collection('threads').find({userId: new ObjectId(userId)}).toArray()).map(doc => {
       const {_id, userId, title, description, messages} = doc
-      return {id: String(_id), userId, title, description, messages}
+      return {id: String(_id), userId: String(userId), title, description, messages}
     })
   } catch (error) {
     console.error('Failed to find thread: ', error)
   }
 }
 
-export const createThread = async (thread: IThread) => {
+export const createThread = async (thread: Omit<IThread, 'id'>) => {
   noStore()
   const client = await clientPromise
   const db = client.db('conversation-data')
+  let id
   try {
-    const collection = db.collection('threads')
-    await collection.insertOne(thread)
+    const result = await db.collection('threads').insertOne({...thread, userId: new ObjectId(thread.userId)})
+    id = String(result.insertedId)
   } catch (error) {
     console.error('Failed to create design: ', error)
   }
-  revalidatePath(`/t/${thread.id}`)
-  redirect(`/t/${thread.id}`)
+  revalidatePath(`/t/${id}`)
+  redirect(`/t/${id}`)
 }
 
 export const updateThread = async (id: string, updatedThread: IThread) => {
@@ -87,10 +87,11 @@ export const updateThread = async (id: string, updatedThread: IThread) => {
   const client = await clientPromise
   const db = client.db('conversation-data')
   try {
-    const collection = db.collection('threads')
-    await collection.updateOne({id}, {
+    await db.collection('threads').updateOne({_id: new ObjectId(id)}, {
       $set: {
-        ...updatedThread
+        title: updatedThread.title,
+        description: updatedThread.description,
+        messages: updatedThread.messages
       }
     })
   } catch (error) {
@@ -105,7 +106,7 @@ export const deleteThread = async (id: string) => {
   const db = client.db('conversation-data')
   try {
     const collection = db.collection('threads')
-    await collection.deleteOne({id})
+    await collection.deleteOne({_id: new ObjectId(id)})
   } catch (error) {
     console.error('Failed to create design: ', error)
   }
