@@ -1,6 +1,7 @@
 export type TRole = 'user' | 'system' | 'bot'
 
 export interface IMessage {
+  id: string
   role: TRole
   content: string
 }
@@ -13,9 +14,9 @@ export interface IThread {
   messages: IMessage[]
 }
 
-export type TCurrentThreadContext = {
-  thread?: IThread
-  setThread: (thread: IThread) => void
+export type TSpeakingContext = {
+  isSpeaking: boolean
+  setIsSpeaking: (val: boolean) => void
 }
 
 export interface IUser {

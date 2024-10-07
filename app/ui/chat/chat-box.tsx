@@ -1,8 +1,8 @@
 "use client"
 
 import "regenerator-runtime/runtime"
+import { useState, useContext } from "react"
 import {v4 as uuidv4} from 'uuid'
-import { useState } from "react"
 import {
   PlayCircleIcon,
   StopCircleIcon,
@@ -15,8 +15,11 @@ import SpeechRecognition, {
 import Button from "@/app/ui/common/button"
 import { sendMessage, createThread, updateThread } from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
+import { SpeakingContext } from "@/app/lib/contexts"
 
-export default function ChatBox({thread}: {thread: IThread | null}) {
+export default function ChatBox({userId, thread}: {userId: string, thread: IThread | null}) {
+  const {setIsSpeaking} = useContext(SpeakingContext)
+
   const [status, setStatus] = useState("idle")
   const [textareaValue, setTextareaValue] = useState("")
 
@@ -51,15 +54,17 @@ export default function ChatBox({thread}: {thread: IThread | null}) {
 
       if (thread === null) {
         const newThread = {
-          id: uuidv4(),
+          userId,
           title: 'Untitled',
           description: '',
           messages: [
             {
+              id: uuidv4(),
               role: 'user' as TRole,
               content: textareaValue
             },
             {
+              id: uuidv4(),
               role: 'bot' as TRole,
               content: response
             }
@@ -72,10 +77,12 @@ export default function ChatBox({thread}: {thread: IThread | null}) {
           messages: [
             ...thread.messages,
             {
+              id: uuidv4(),
               role: 'user' as TRole,
               content: textareaValue
             },
             {
+              id: uuidv4(),
               role: 'bot' as TRole,
               content: response
             }
@@ -84,13 +91,19 @@ export default function ChatBox({thread}: {thread: IThread | null}) {
         await updateThread(thread.id, updatedThread)
       }
 
-      const utterance = new SpeechSynthesisUtterance(response)
-      utterance.lang = "en-GB"
-      utterance.voice = window.speechSynthesis.getVoices()[8]
-      window.speechSynthesis.speak(utterance)
+      handleStartUttering(response)
       setTextareaValue("")
     }
     resetTranscript()
+  }
+
+  const handleStartUttering = (text: string) => {
+    setIsSpeaking(true)
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = "en-GB"
+    utterance.voice = window.speechSynthesis.getVoices()[8]
+    window.speechSynthesis.speak(utterance)
+    utterance.onend = () => setIsSpeaking(false)
   }
 
   return (
