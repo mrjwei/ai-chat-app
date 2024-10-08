@@ -1,14 +1,16 @@
 "use client"
 
 import "regenerator-runtime/runtime"
-import { useState, useContext } from "react"
+import { useState, useContext, useEffect, useRef } from "react"
 import {v4 as uuidv4} from 'uuid'
 import {
   PlayCircleIcon,
   StopCircleIcon,
   ArrowPathIcon,
-  ArrowUpCircleIcon
 } from '@heroicons/react/24/solid'
+import {
+  ArrowUpIcon
+} from '@heroicons/react/24/outline'
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition"
@@ -18,12 +20,25 @@ import { TRole, IThread } from "@/app/lib/types"
 import { SpeakingContext } from "@/app/lib/contexts"
 
 export default function ChatBox({userId, thread}: {userId: string, thread: IThread | null}) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
   const {setIsSpeaking} = useContext(SpeakingContext)
 
   const [status, setStatus] = useState("idle")
   const [textareaValue, setTextareaValue] = useState("")
 
   const { transcript, resetTranscript, listening } = useSpeechRecognition()
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      if (textareaValue === '') {
+        textareaRef.current.style.height = 'auto'
+      } else {
+        const height = textareaRef.current.scrollHeight
+        textareaRef.current.style.height = height + 'px'
+      }
+    }
+  }, [textareaValue])
 
   const handleStart = () => {
     setStatus("recording")
@@ -107,8 +122,8 @@ export default function ChatBox({userId, thread}: {userId: string, thread: IThre
   }
 
   return (
-    <div className="sticky bottom-0 right-0 px-8 py-4 w-full bg-gray-100 shadow grid grid-cols-12 gap-4 z-40">
-      <div className="flex col-span-2">
+    <div className="sticky bottom-0 right-0 px-8 py-4 w-full bg-gray-100 shadow flex items-stretch justify-center gap-4 z-40">
+      <div className="flex">
         {status === "recording" ? (
           <Button onClick={handleStop} className="block h-full text-red-500">
             <StopCircleIcon className="w-8"/>
@@ -123,14 +138,16 @@ export default function ChatBox({userId, thread}: {userId: string, thread: IThre
         </Button>
       </div>
       <textarea
-        className="block w-full col-span-8 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] mx-auto p-2 rounded-md -translate-x-[7.5px]"
+        ref={textareaRef}
+        className="block w-full max-w-none lg:max-w-[40rem] p-2 rounded-md -translate-x-[7.5px]"
         value={textareaValue}
         onChange={(e) => setTextareaValue(e.target.value)}
         placeholder="Record or type your message..."
       ></textarea>
-      <div className="col-span-2">
-        <Button onClick={handleSend} className="block h-full">
-          <ArrowUpCircleIcon className="w-8"/>
+      <div className="">
+        <Button onClick={handleSend} className="h-full flex items-center rounded-md bg-gray-800 text-white">
+          <ArrowUpIcon className="w-4 mr-2"/>
+          <span>Send</span>
         </Button>
       </div>
     </div>
