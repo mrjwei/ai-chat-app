@@ -2,15 +2,13 @@
 
 import "regenerator-runtime/runtime"
 import { useState, useContext, useEffect, useRef } from "react"
-import {v4 as uuidv4} from 'uuid'
+import { v4 as uuidv4 } from "uuid"
 import {
   PlayCircleIcon,
   StopCircleIcon,
   ArrowPathIcon,
-} from '@heroicons/react/24/solid'
-import {
-  ArrowUpIcon
-} from '@heroicons/react/24/outline'
+  ArrowUpCircleIcon,
+} from "@heroicons/react/24/solid"
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition"
@@ -19,10 +17,16 @@ import { sendMessage, createThread, updateThread } from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
 import { SpeakingContext } from "@/app/lib/contexts"
 
-export default function ChatBox({userId, thread}: {userId: string, thread: IThread | null}) {
+export default function ChatBox({
+  userId,
+  thread,
+}: {
+  userId: string
+  thread: IThread | null
+}) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const {setIsSpeaking} = useContext(SpeakingContext)
+  const { setIsSpeaking } = useContext(SpeakingContext)
 
   const [status, setStatus] = useState("idle")
   const [textareaValue, setTextareaValue] = useState("")
@@ -31,11 +35,11 @@ export default function ChatBox({userId, thread}: {userId: string, thread: IThre
 
   useEffect(() => {
     if (textareaRef.current) {
-      if (textareaValue === '') {
-        textareaRef.current.style.height = 'auto'
+      if (textareaValue === "") {
+        textareaRef.current.style.height = "auto"
       } else {
         const height = textareaRef.current.scrollHeight
-        textareaRef.current.style.height = height + 'px'
+        textareaRef.current.style.height = height + "px"
       }
     }
   }, [textareaValue])
@@ -70,20 +74,20 @@ export default function ChatBox({userId, thread}: {userId: string, thread: IThre
       if (thread === null) {
         const newThread = {
           userId,
-          title: 'Untitled',
-          description: '',
+          title: "Untitled",
+          description: "",
           messages: [
             {
               id: uuidv4(),
-              role: 'user' as TRole,
-              content: textareaValue
+              role: "user" as TRole,
+              content: textareaValue,
             },
             {
               id: uuidv4(),
-              role: 'bot' as TRole,
-              content: response
-            }
-          ]
+              role: "bot" as TRole,
+              content: response,
+            },
+          ],
         }
         await createThread(newThread)
       } else {
@@ -93,15 +97,15 @@ export default function ChatBox({userId, thread}: {userId: string, thread: IThre
             ...thread.messages,
             {
               id: uuidv4(),
-              role: 'user' as TRole,
-              content: textareaValue
+              role: "user" as TRole,
+              content: textareaValue,
             },
             {
               id: uuidv4(),
-              role: 'bot' as TRole,
-              content: response
-            }
-          ]
+              role: "bot" as TRole,
+              content: response,
+            },
+          ],
         }
         await updateThread(thread.id, updatedThread)
       }
@@ -122,34 +126,31 @@ export default function ChatBox({userId, thread}: {userId: string, thread: IThre
   }
 
   return (
-    <div className="sticky bottom-0 right-0 px-8 py-4 w-full bg-gray-100 shadow flex items-stretch justify-center gap-4 z-40">
-      <div className="flex">
+    <div className="sticky bottom-0 right-0 px-4 lg:px-8 py-4 w-full bg-gray-100 shadow flex items-stretch justify-center z-40">
+      <div className="flex mr-1">
         {status === "recording" ? (
-          <Button onClick={handleStop} className="block h-full text-red-500">
-            <StopCircleIcon className="w-8"/>
+          <Button onClick={handleStop} className="text-red-500 !p-2">
+            <StopCircleIcon className="w-8" />
           </Button>
         ) : (
-          <Button onClick={handleStart} className="block h-full">
-            <PlayCircleIcon className="w-8"/>
+          <Button onClick={handleStart} className="!p-2">
+            <PlayCircleIcon className="w-8" />
           </Button>
         )}
-        <Button onClick={handleReset}>
-          <ArrowPathIcon className="w-8"/>
+        <Button onClick={handleReset} className="!p-2">
+          <ArrowPathIcon className="w-8" />
         </Button>
       </div>
       <textarea
         ref={textareaRef}
-        className="block w-full max-w-none lg:max-w-[40rem] p-2 rounded-md -translate-x-[7.5px]"
+        className="block flex-1 min-w-40 lg:max-w-[40rem] p-2 rounded-md -translate-x-[7.5px] mr-1"
         value={textareaValue}
         onChange={(e) => setTextareaValue(e.target.value)}
         placeholder="Record or type your message..."
       ></textarea>
-      <div className="">
-        <Button onClick={handleSend} className="h-full flex items-center rounded-md bg-gray-800 text-white">
-          <ArrowUpIcon className="w-4 mr-2"/>
-          <span>Send</span>
-        </Button>
-      </div>
+      <Button onClick={handleSend} className="!p-2">
+        <ArrowUpCircleIcon className="w-8" />
+      </Button>
     </div>
   )
 }
