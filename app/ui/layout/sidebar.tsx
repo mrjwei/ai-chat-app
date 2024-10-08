@@ -1,11 +1,9 @@
 import Link from "next/link"
-import {
-  PlusIcon
-} from '@heroicons/react/24/outline'
+import { PlusIcon } from "@heroicons/react/24/outline"
 import { fetchThreads } from "@/app/lib/api"
-import ChatList from '@/app/ui/layout/chat-list'
+import ChatList from "@/app/ui/layout/chat-list"
 import { auth } from "@/auth"
-import Profile from '@/app/ui/layout/profile'
+import Profile from "@/app/ui/layout/profile"
 import { IThread, IUser } from "@/app/lib/types"
 
 export default async function Sidebar() {
@@ -15,12 +13,12 @@ export default async function Sidebar() {
     return
   }
 
-  const threads = await fetchThreads(session.user.id!) as IThread[]
+  const threads = (await fetchThreads(session.user.id!)) as IThread[]
 
   return (
-    <aside className="bg-gray-800 text-white col-span-2 sticky top-0 h-screen flex flex-col justify-between">
-      <div className="">
-        <Link href='/' className="flex items-center border-b-2 border-gray-600 p-4 mb-4">
+    <aside className="bg-gray-800 text-white lg:col-span-2 lg:sticky  top-0 h-screen hidden lg:flex lg:flex-col justify-between p-4 text-sm">
+      <div>
+        <Link href="/" className="flex items-center p-2 rounded border-2 border-white mb-4 font-medium hover:text-gray-800 hover:bg-white">
           <PlusIcon className="w-5 mr-1" />
           <span>New Chat</span>
         </Link>

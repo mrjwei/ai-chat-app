@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import clsx from 'clsx'
 import Link from "next/link"
 import {usePathname, useRouter} from 'next/navigation'
 import { IThread } from "@/app/lib/types"
@@ -90,7 +91,12 @@ export default function ChatList({ threads }: { threads: IThread[] }) {
               ) : (
                 <Link
                   href={`/t/${thread.id}`}
-                  className="block w-full whitespace-nowrap overflow-hidden text-ellipsis px-4 py-1"
+                  className={clsx(
+                    "block w-full whitespace-nowrap overflow-hidden text-ellipsis px-4 py-1 rounded",
+                    {
+                      'bg-gray-600': displayedThreadId === thread.id
+                    }
+                  )}
                 >
                   {thread.title}
                 </Link>

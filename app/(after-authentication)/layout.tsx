@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <div className="flex-1 grid grid-cols-12 relative">
       <Sidebar />
-      <main className="col-span-10 flex flex-col justify-end h-full">
+      <main className="relative col-span-12 lg:col-span-10 flex flex-col justify-end h-full">
         {children}
       </main>
     </div>

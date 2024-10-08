@@ -2,6 +2,7 @@
 
 import {useState, useRef, useEffect} from 'react'
 import Link from 'next/link'
+import clsx from 'clsx'
 import { usePathname, useSearchParams } from 'next/navigation'
 import {
   ChevronDownIcon,
@@ -38,7 +39,12 @@ export default function Profile({user}: {user: IUser}) {
     <div className="w-full relative">
       <Button
         type="button"
-        className={`w-full flex items-center text-white ${isProfileMenuOpen ? 'bg-gray-600' : ''}`}
+        className={clsx(
+          'w-full flex items-center text-white px-4 py-1 rounded',
+          {
+            'bg-gray-600': isProfileMenuOpen
+          }
+        )}
         onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
         ref={profileRef}
       >
@@ -46,13 +52,13 @@ export default function Profile({user}: {user: IUser}) {
         {isProfileMenuOpen ? (<ChevronUpIcon className="w-4" />) : (<ChevronDownIcon className="w-4" />)}
       </Button>
       {isProfileMenuOpen && (
-        <ul className="absolute bottom-full -translate-y-1 left-2 bg-white shadow-md rounded-lg p-2" ref={profileMenuRef}>
+        <ul className="absolute w-2/3 bottom-full -translate-y-1 left-0 bg-white shadow-md rounded p-2" ref={profileMenuRef}>
           <li>
-            <Link href="/" className="block w-full text-gray-800 px-8 py-2 rounded-lg hover:bg-gray-100">Setting</Link>
+            <Link href="/" className="block text-gray-800 px-2 py-2 rounded hover:bg-gray-100">Setting</Link>
           </li>
           <li>
             <form action={signOut}>
-              <Button type="submit" className="w-full px-8 py-2 flex items-center rounded-lg font-medium text-gray-800 hover:bg-gray-100">Sign Out</Button>
+              <Button type="submit" className="w-full px-2 py-2 flex items-center rounded text-gray-800 font-normal hover:bg-gray-100">Sign Out</Button>
             </form>
           </li>
         </ul>

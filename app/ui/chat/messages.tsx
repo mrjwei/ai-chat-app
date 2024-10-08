@@ -12,7 +12,7 @@ export default function Messages({thread}: {thread: any}) {
   }
 
   return (
-    <div className="flex-1 bg-white overflow-y-scroll p-8 grid grid-cols-12">
+    <div className="flex-1 bg-white p-8 grid grid-cols-12">
       <div className="col-span-8 col-start-3">
         {messages.map((message: IMessage) => {
           return (
