@@ -16,7 +16,7 @@ export default async function Sidebar() {
   const threads = (await fetchThreads(session.user.id!)) as IThread[]
 
   return (
-    <aside className="bg-gray-800 text-white lg:col-span-2 lg:sticky  top-0 h-screen hidden lg:flex lg:flex-col justify-between p-4 text-sm">
+    <aside className="bg-gray-800 text-white h-screen lg:flex lg:flex-col justify-between p-4 text-sm lg:sticky top-0">
       <div>
         <Link href="/" className="flex items-center p-2 rounded border-2 border-white mb-4 font-medium hover:text-gray-800 hover:bg-white">
           <PlusIcon className="w-5 mr-1" />
