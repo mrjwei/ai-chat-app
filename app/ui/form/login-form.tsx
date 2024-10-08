@@ -2,8 +2,6 @@
 
 import React, { useActionState } from "react"
 import { signIn } from "@/app/lib/api"
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
-import { ArrowRightIcon } from "@heroicons/react/20/solid"
 import Button from "@/app/ui/common/button"
 import FormControl from "@/app/ui/form/form-control"
 
