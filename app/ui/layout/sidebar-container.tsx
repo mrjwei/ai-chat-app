@@ -23,7 +23,7 @@ export default function SidebarContainer({
       {/* large screen */}
       <div className="hidden lg:col-span-2 lg:block">{children}</div>
       {/* small screen */}
-      <div className="lg:hidden absolute w-full h-full left-0 top-0 z-10">
+      <div className="lg:hidden absolute w-full left-0 top-0 z-50">
         <div className="bg-white shadow">
           <Button onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? (
@@ -34,7 +34,7 @@ export default function SidebarContainer({
           </Button>
         </div>
         {isOpen && (
-          <div className="">
+          <div className="h-[calc(100vh-48px)]">
             {children}
           </div>
         )}

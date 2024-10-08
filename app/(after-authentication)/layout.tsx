@@ -11,7 +11,7 @@ export default function RootLayout({
       <SidebarContainer>
         <Sidebar />
       </SidebarContainer>
-      <main className="relative col-span-12 lg:col-span-10 flex flex-col justify-end h-full z-0">
+      <main className="relative col-span-12 lg:col-span-10 flex flex-col justify-end h-full">
         {children}
       </main>
     </div>

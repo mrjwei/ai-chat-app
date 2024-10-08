@@ -107,7 +107,7 @@ export default function ChatBox({userId, thread}: {userId: string, thread: IThre
   }
 
   return (
-    <div className="sticky bottom-0 right-0 px-8 py-4 w-full bg-gray-100 shadow grid grid-cols-12 gap-4">
+    <div className="sticky bottom-0 right-0 px-8 py-4 w-full bg-gray-100 shadow grid grid-cols-12 gap-4 z-40">
       <div className="flex col-span-2">
         {status === "recording" ? (
           <Button onClick={handleStop} className="block h-full text-red-500">
