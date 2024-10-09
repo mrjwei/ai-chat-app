@@ -30,6 +30,7 @@ export default function ChatBox({
 
   const [status, setStatus] = useState("idle")
   const [textareaValue, setTextareaValue] = useState("")
+  const [response, setResponse] = useState("")
   const [activeThread, setActiveThread] = useState<IThread | null>(thread)
   const [shouldUpdateThread, setShouldUpdateThread] = useState(false)
 
@@ -45,6 +46,19 @@ export default function ChatBox({
       }
     }
   }, [textareaValue])
+
+  useEffect(() => {
+    if (response !== '') {
+      const utterance = new SpeechSynthesisUtterance(response)
+      utterance.lang = "en-GB"
+      utterance.voice = window.speechSynthesis.getVoices()[8]
+      window.speechSynthesis.speak(utterance)
+      utterance.onend = () => {
+        setIsSpeaking(false)
+        setShouldUpdateThread(true)
+      }
+    }
+  }, [response])
 
   useEffect(() => {
     const fetchThread = async () => {
@@ -89,7 +103,6 @@ export default function ChatBox({
     setShouldUpdateThread(false)
 
     if (textareaValue) {
-      let response
       if (thread === null) {
         // create thread
         const messages = [
@@ -104,7 +117,8 @@ export default function ChatBox({
             content: textareaValue
           }
         ]
-        response = await sendMessages(messages)
+        const res = await sendMessages(messages)
+        setResponse(res)
 
         const newThread = {
           userId,
@@ -115,7 +129,7 @@ export default function ChatBox({
             {
               id: uuidv4(),
               role: "assistant" as TRole,
-              content: response,
+              content: res,
             },
           ]
         }
@@ -129,8 +143,9 @@ export default function ChatBox({
           id: uuidv4(),
           role: "user" as TRole,
           content: textareaValue,
-        },
-        response = await sendMessages([...activeThread!.messages, newMessage])
+        }
+        const res = await sendMessages([...activeThread!.messages, newMessage])
+        setResponse(res)
 
         const updatedThread = {
           ...activeThread!,
@@ -140,7 +155,7 @@ export default function ChatBox({
             {
               id: uuidv4(),
               role: "assistant" as TRole,
-              content: response,
+              content: res,
             },
           ],
         }
@@ -148,19 +163,9 @@ export default function ChatBox({
       }
 
       setTextareaValue("")
-      setShouldUpdateThread(true)
-      handleStartUttering(response)
+      setResponse('')
     }
     resetTranscript()
-  }
-
-  const handleStartUttering = (text: string) => {
-    setIsSpeaking(true)
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = "en-GB"
-    utterance.voice = window.speechSynthesis.getVoices()[8]
-    window.speechSynthesis.speak(utterance)
-    utterance.onend = () => setIsSpeaking(false)
   }
 
   return (
