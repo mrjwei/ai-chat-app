@@ -37,8 +37,8 @@ export default function Messages({thread}: {thread: any}) {
 
   return (
     <div className="flex-1 h-[calc(100%-96px)] bg-white px-8 pt-16 pb-8 grid grid-cols-12">
-      <div className="col-span-8 col-start-3">
-        {messages.map((message: IMessage) => {
+      <div className="col-span-12 lg:col-span-8 lg:col-start-3">
+        {messages.filter((message: IMessage) => message.role !== 'system').map((message: IMessage) => {
           return (
             <div key={message.id} className={clsx(
               'w-full flex mb-8',
