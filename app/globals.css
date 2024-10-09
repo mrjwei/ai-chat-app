@@ -7,3 +7,9 @@
     @apply text-gray-800;
   }
 }
+
+@layer components {
+  .no-scroll {
+    @apply overflow-hidden w-full h-full fixed;
+  }
+}

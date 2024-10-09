@@ -18,6 +18,17 @@ export default function SidebarContainer({
     setIsOpen(false)
   }, [pathname]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('no-scroll');
+    } else {
+      document.body.classList.remove('no-scroll');
+    }
+    return () => {
+      document.body.classList.remove('no-scroll');
+    };
+  }, [isOpen])
+
   return (
     <>
       {/* large screen */}
