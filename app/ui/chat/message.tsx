@@ -36,10 +36,10 @@ export default function Message({message }: {message: IMessage }) {
     <div
       className={clsx("max-w-full p-4 rounded-md shadow", {
         "bg-gray-100": message.role === "user",
-        "bg-blue-100": message.role === "bot",
+        "bg-blue-100": message.role === "assistant",
       })}
     >
-      {message.role === "bot" ? (
+      {message.role === "assistant" ? (
         <div className="flex items-center">
           <div>
             <Markdown>{message.content}</Markdown>

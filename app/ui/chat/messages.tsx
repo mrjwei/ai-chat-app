@@ -20,7 +20,7 @@ export default function Messages({thread}: {thread: any}) {
               'w-full flex mb-8',
               {
                 'justify-end': message.role === 'user',
-                'justify-start': message.role === 'bot',
+                'justify-start': message.role === 'assistant',
               }
             )}>
               <Message message={message} />

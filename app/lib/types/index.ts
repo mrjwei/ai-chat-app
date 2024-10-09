@@ -1,4 +1,4 @@
-export type TRole = 'user' | 'system' | 'bot'
+export type TRole = 'user' | 'system' | 'assistant'
 
 export interface IMessage {
   id: string

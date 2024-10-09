@@ -13,7 +13,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition"
 import Button from "@/app/ui/common/button"
-import { sendMessage, createThread, updateThread } from "@/app/lib/api"
+import { sendMessages, createThread, updateThread, fetchThreadById } from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
 import { SpeakingContext } from "@/app/lib/contexts"
 
@@ -30,6 +30,8 @@ export default function ChatBox({
 
   const [status, setStatus] = useState("idle")
   const [textareaValue, setTextareaValue] = useState("")
+  const [activeThread, setActiveThread] = useState<IThread | null>(thread)
+  const [shouldUpdateThread, setShouldUpdateThread] = useState(false)
 
   const { transcript, resetTranscript, listening } = useSpeechRecognition()
 
@@ -43,6 +45,22 @@ export default function ChatBox({
       }
     }
   }, [textareaValue])
+
+  useEffect(() => {
+    const fetchThread = async () => {
+      if (!activeThread) {
+        return null
+      }
+      return await fetchThreadById(activeThread.id)
+    }
+    if (shouldUpdateThread) {
+      fetchThread().then(res => {
+        if (res) {
+          setActiveThread(res)
+        }
+      })
+    }
+  }, [shouldUpdateThread])
 
   const handleStart = () => {
     setStatus("recording")
@@ -68,50 +86,70 @@ export default function ChatBox({
   }
 
   const handleSend = async () => {
-    if (textareaValue) {
-      const response = await sendMessage(textareaValue)
+    setShouldUpdateThread(false)
 
+    if (textareaValue) {
+      let response
       if (thread === null) {
+        // create thread
+        const messages = [
+          {
+            id: uuidv4(),
+            role: "system" as TRole,
+            content: 'You are a native English teacher. From now on, please help me practise English speaking for IELTS speaking test. You should ask me 4 to 5 questions in total on a topic about me or things that are closely related to me. You should ask only one question per time and should end our conversation after the specified number of questions by signaling that it is the end for the practice. If relevant, please correct my major mistakes that impede understanding while ignoring minor errors. Please also suggest more idiomatic words and expressions where relevant. Please choose questions as close to the real test as possible and please use UK English instead of US English. After final question, please give me a score based on IELTS 9.0 scale.',
+          },
+          {
+            id: uuidv4(),
+            role: 'user' as TRole,
+            content: textareaValue
+          }
+        ]
+        response = await sendMessages(messages)
+
         const newThread = {
           userId,
           title: "Untitled",
           description: "",
           messages: [
+            ...messages,
             {
               id: uuidv4(),
-              role: "user" as TRole,
-              content: textareaValue,
-            },
-            {
-              id: uuidv4(),
-              role: "bot" as TRole,
+              role: "assistant" as TRole,
               content: response,
             },
-          ],
+          ]
         }
-        await createThread(newThread)
+        const id = await createThread(newThread)
+        const thread = await fetchThreadById(id)
+        if (thread) {
+          setActiveThread(thread)
+        }
       } else {
+        const newMessage = {
+          id: uuidv4(),
+          role: "user" as TRole,
+          content: textareaValue,
+        },
+        response = await sendMessages([...activeThread!.messages, newMessage])
+
         const updatedThread = {
-          ...thread,
+          ...activeThread!,
           messages: [
-            ...thread.messages,
+            ...activeThread!.messages,
+            newMessage,
             {
               id: uuidv4(),
-              role: "user" as TRole,
-              content: textareaValue,
-            },
-            {
-              id: uuidv4(),
-              role: "bot" as TRole,
+              role: "assistant" as TRole,
               content: response,
             },
           ],
         }
-        await updateThread(thread.id, updatedThread)
+        await updateThread(activeThread!.id, updatedThread)
       }
 
-      handleStartUttering(response)
       setTextareaValue("")
+      setShouldUpdateThread(true)
+      handleStartUttering(response)
     }
     resetTranscript()
   }
