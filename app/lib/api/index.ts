@@ -11,6 +11,28 @@ import {signIn as authSignIn, signOut as authSignOut} from '@/auth'
 
 const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
 
+export const transcribe = async (audioBlob: Blob) => {
+  const formData = new FormData();
+  formData.append("file", audioBlob, "audio.wav")
+  formData.append("model", "whisper-1")
+
+  try {
+    const response = await axios.post(
+      "https://api.openai.com/v1/audio/transcriptions",
+      formData,
+      {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    const { text } = response.data
+    return text
+  } catch (error) {
+    console.error("Error during transcription:", error);
+  }
+}
+
 export const sendMessages = async (messages: IMessage[]) => {
   const messagesWithoutId = messages.map(msg => ({
     role: msg.role,

@@ -2,6 +2,7 @@
 
 import "regenerator-runtime/runtime"
 import { useState, useContext, useEffect, useRef } from "react"
+import dynamic from "next/dynamic"
 import { v4 as uuidv4 } from "uuid"
 import {
   PlayCircleIcon,
@@ -9,13 +10,13 @@ import {
   ArrowPathIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/solid"
-import SpeechRecognition, {
-  useSpeechRecognition,
-} from "react-speech-recognition"
+// import { ReactMic, ReactMicStopEvent } from "react-mic"
 import Button from "@/app/ui/common/button"
-import { sendMessages, createThread, updateThread, fetchThreadById } from "@/app/lib/api"
+import { transcribe, sendMessages, createThread, updateThread, fetchThreadById } from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
 import { SpeakingContext } from "@/app/lib/contexts"
+
+const ReactMic = dynamic(() => import("react-mic").then((mod) => mod.ReactMic), { ssr: false })
 
 export default function ChatBox({
   userId,
@@ -28,13 +29,13 @@ export default function ChatBox({
 
   const { setIsSpeaking } = useContext(SpeakingContext)
 
-  const [status, setStatus] = useState("idle")
+  const shouldTranscribeRef = useRef(false)
+
+  const [record, setRecord] = useState(false)
   const [textareaValue, setTextareaValue] = useState("")
   const [response, setResponse] = useState("")
   const [activeThread, setActiveThread] = useState<IThread | null>(thread)
   const [shouldUpdateThread, setShouldUpdateThread] = useState(false)
-
-  const { transcript, resetTranscript, listening } = useSpeechRecognition()
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -77,26 +78,38 @@ export default function ChatBox({
   }, [shouldUpdateThread])
 
   const handleStart = () => {
-    setStatus("recording")
-    resetTranscript()
-    SpeechRecognition.startListening({ continuous: true, language: "en-GB" })
+    setRecord(true)
   }
 
   const handleStop = () => {
-    setStatus("idle")
-    SpeechRecognition.stopListening()
-    if (transcript) {
-      setTextareaValue(textareaValue + transcript.trim() + ". ")
+    shouldTranscribeRef.current = true
+    setRecord(false)
+  }
+
+  const handleTranscribe = async (recordedBlob: any) => {
+    if (shouldTranscribeRef.current) {
+      const transcript = await transcribe(recordedBlob.blob)
+      setTextareaValue(prev => {
+        if (transcript.endsWith(".") ||
+            transcript.endsWith(",") ||
+            transcript.endsWith(";") ||
+            transcript.endsWith(":") ||
+            transcript.endsWith("?") ||
+            transcript.endsWith("!")
+        ) {
+          return prev + transcript + ' '
+        } else {
+          return prev + transcript + '. '
+        }
+      })
     }
+    shouldTranscribeRef.current = false
   }
 
   const handleReset = () => {
-    if (listening) {
-      SpeechRecognition.stopListening()
-    }
-    setStatus("idle")
+    shouldTranscribeRef.current = false
+    setRecord(false)
     setTextareaValue("")
-    resetTranscript()
   }
 
   const handleSend = async () => {
@@ -165,13 +178,20 @@ export default function ChatBox({
       setTextareaValue("")
       setResponse('')
     }
-    resetTranscript()
   }
 
   return (
     <div className="sticky bottom-0 right-0 px-4 lg:px-8 py-4 w-full bg-gray-100 shadow flex items-stretch justify-center z-40">
+      <ReactMic
+        record={record}
+        className="hidden"
+        onStop={handleTranscribe}
+        mimeType="audio/wav"
+        strokeColor="#000"
+        backgroundColor="#FF4081"
+      />
       <div className="flex mr-1">
-        {status === "recording" ? (
+        {record ? (
           <Button onClick={handleStop} className="text-red-500 !p-2">
             <StopCircleIcon className="w-8" />
           </Button>
