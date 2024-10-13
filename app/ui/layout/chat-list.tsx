@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import clsx from 'clsx'
 import Link from "next/link"
 import {usePathname, useRouter} from 'next/navigation'
@@ -12,6 +12,7 @@ export default function ChatList({ threads }: { threads: IThread[] }) {
   const displayedThreadId = usePathname().split('/').slice(-1)[0]
   const router = useRouter()
 
+  const [isMobile, setIsMobile] = useState(false)
   const [menuVisible, setMenuVisible] = useState(false)
   const [menuPos, setMenuPos] = useState({
     x: 0,
@@ -20,6 +21,8 @@ export default function ChatList({ threads }: { threads: IThread[] }) {
   const [targetThread, setTargetThread] = useState<IThread | null>(null)
   const [inputVal, setInputVal] = useState("")
   const [isEditing, setIsEditing] = useState(false)
+
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>()
 
   const contextMenu = [
     {
@@ -41,6 +44,13 @@ export default function ChatList({ threads }: { threads: IThread[] }) {
   ]
 
   useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase()
+    if (/android|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(userAgent)) {
+      setIsMobile(true)
+    }
+  }, []);
+
+  useEffect(() => {
     const handleClick = () => {
       setMenuVisible(false)
     }
@@ -49,13 +59,41 @@ export default function ChatList({ threads }: { threads: IThread[] }) {
   }, [])
 
   const handleRightClick = (event: React.MouseEvent, thread: IThread) => {
-    event.preventDefault()
-    setMenuPos({
-      x: event.clientX,
-      y: event.clientY,
-    })
-    setTargetThread(thread)
-    setMenuVisible(true)
+    if (!isMobile) {
+      event.preventDefault()
+      setMenuPos({
+        x: event.clientX,
+        y: event.clientY,
+      })
+      setTargetThread(thread)
+      setMenuVisible(true)
+    }
+  }
+
+  const handleTouchStart = (event: React.TouchEvent, thread: IThread) => {
+    if (isMobile) {
+      const touch = event.touches[0]
+      timerRef.current = setTimeout(() => {
+        setMenuPos({
+          x: touch.pageX,
+          y: touch.pageY,
+        })
+        setTargetThread(thread)
+        setMenuVisible(true)
+      }, 1000)
+    }
+  }
+
+  const handleTouchEnd = () => {
+    if (isMobile) {
+      clearTimeout(timerRef.current)
+    }
+  }
+
+  const handleTouchMove = () => {
+    if (isMobile) {
+      clearTimeout(timerRef.current)
+    }
   }
 
   const handleSave = async () => {
@@ -75,6 +113,9 @@ export default function ChatList({ threads }: { threads: IThread[] }) {
             <li
               key={thread.id}
               onContextMenu={(e) => handleRightClick(e, thread)}
+              onTouchStart={(e) => handleTouchStart(e, thread)}
+              onTouchEnd={handleTouchEnd}
+              onTouchMove={handleTouchMove}
             >
               {isEditing && targetThread && thread.id === targetThread.id ? (
                 <div className="px-4 py-1">
