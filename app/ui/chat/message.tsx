@@ -1,6 +1,5 @@
 "use client"
 
-import { useContext } from "react"
 import Markdown from "react-markdown"
 import clsx from "clsx"
 import {
@@ -8,11 +7,9 @@ import {
   ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 import Button from "@/app/ui/common/button"
-import { SpeakingContext } from "@/app/lib/contexts"
 import { IMessage } from "@/app/lib/types"
 
-export default function Message({isActive, message, handleToggle}: {isActive: boolean, message: IMessage, handleToggle: (message: IMessage) => void }) {
-  const {isSpeaking} = useContext(SpeakingContext)
+export default function Message({isActive, message, handleToggle, isSpeaking}: {isActive: boolean, message: IMessage, handleToggle: (message: IMessage) => void, isSpeaking: boolean }) {
 
   return (
     <div

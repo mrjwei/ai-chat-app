@@ -1,25 +1,23 @@
 'use client'
 
-import { useState, useContext } from "react"
+import { useContext } from "react"
 import clsx from "clsx"
 import {IMessage} from '@/app/lib/types'
 import Message from '@/app/ui/chat/message'
 import { SpeakingContext } from "@/app/lib/contexts"
 
 export default function Messages({thread}: {thread: any}) {
-  const {isSpeaking, setIsSpeaking} = useContext(SpeakingContext)
-
-  const [activeMessageId, setActiveMessageId] = useState('')
+  const {isSpeaking, setIsSpeaking, activeMessage, setActiveMessage} = useContext(SpeakingContext)
 
   const handleToggle = (message: IMessage) => {
     if (isSpeaking) {
-      setActiveMessageId('')
       setIsSpeaking(false)
+      setActiveMessage(null)
       window.speechSynthesis.cancel()
     } else {
-      setActiveMessageId(message.id)
-      setIsSpeaking(true)
+      setActiveMessage(message)
       const utterance = new SpeechSynthesisUtterance(message.content)
+      utterance.onstart = () => setIsSpeaking(true)
       utterance.lang = "en-GB"
       utterance.voice = window.speechSynthesis.getVoices()[8]
       window.speechSynthesis.speak(utterance)
@@ -47,7 +45,7 @@ export default function Messages({thread}: {thread: any}) {
                 'justify-start': message.role === 'assistant',
               }
             )}>
-              <Message isActive={activeMessageId === message.id} message={message} handleToggle={handleToggle} />
+              <Message isActive={activeMessage?.id === message.id} message={message} handleToggle={handleToggle} isSpeaking={isSpeaking} />
             </div>
           )
         })}

@@ -52,7 +52,7 @@ export const sendMessages = async (messages: IMessage[]) => {
         },
       },
     )
-    return res.data.choices[0].message.content
+    return res.data.choices[0].message
   } catch (error) {
     console.error(`Error sending message: ${error}`)
     return 'Something went wrong'

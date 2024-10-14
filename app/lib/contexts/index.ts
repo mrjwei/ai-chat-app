@@ -3,5 +3,7 @@ import {TSpeakingContext} from '@/app/lib/types'
 
 export const SpeakingContext = createContext<TSpeakingContext>({
   isSpeaking: false,
-  setIsSpeaking: () => {}
+  setIsSpeaking: () => {},
+  activeMessage: null,
+  setActiveMessage: () => {}
 })

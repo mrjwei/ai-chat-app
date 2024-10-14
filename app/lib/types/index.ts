@@ -17,6 +17,8 @@ export interface IThread {
 export type TSpeakingContext = {
   isSpeaking: boolean
   setIsSpeaking: (val: boolean) => void
+  activeMessage: IMessage | null
+  setActiveMessage: (val: IMessage | null) => void
 }
 
 export interface IUser {

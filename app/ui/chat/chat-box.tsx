@@ -10,7 +10,6 @@ import {
   ArrowPathIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/solid"
-// import { ReactMic, ReactMicStopEvent } from "react-mic"
 import Button from "@/app/ui/common/button"
 import { transcribe, sendMessages, createThread, updateThread, fetchThreadById } from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
@@ -25,15 +24,14 @@ export default function ChatBox({
   userId: string
   thread: IThread | null
 }) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const {setIsSpeaking, setActiveMessage} = useContext(SpeakingContext)
 
-  const { setIsSpeaking } = useContext(SpeakingContext)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const shouldTranscribeRef = useRef(false)
 
   const [record, setRecord] = useState(false)
   const [textareaValue, setTextareaValue] = useState("")
-  const [response, setResponse] = useState("")
   const [activeThread, setActiveThread] = useState<IThread | null>(thread)
   const [shouldUpdateThread, setShouldUpdateThread] = useState(false)
 
@@ -49,19 +47,6 @@ export default function ChatBox({
   }, [textareaValue])
 
   useEffect(() => {
-    if (response !== '') {
-      const utterance = new SpeechSynthesisUtterance(response)
-      utterance.lang = "en-GB"
-      utterance.voice = window.speechSynthesis.getVoices()[8]
-      window.speechSynthesis.speak(utterance)
-      utterance.onend = () => {
-        setIsSpeaking(false)
-        setShouldUpdateThread(true)
-      }
-    }
-  }, [response])
-
-  useEffect(() => {
     const fetchThread = async () => {
       if (!activeThread) {
         return null
@@ -72,6 +57,8 @@ export default function ChatBox({
       fetchThread().then(res => {
         if (res) {
           setActiveThread(res)
+          setActiveMessage(res.messages.slice(-1)[0])
+          utter(res.messages.slice(-1)[0].content)
         }
       })
     }
@@ -112,6 +99,20 @@ export default function ChatBox({
     setTextareaValue("")
   }
 
+  const utter = (text: string) => {
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.onstart = () => {
+      setIsSpeaking(true)
+    }
+    utterance.lang = "en-GB"
+    utterance.voice = window.speechSynthesis.getVoices()[8]
+    window.speechSynthesis.speak(utterance)
+    utterance.onend = () => {
+      setIsSpeaking(false)
+      setShouldUpdateThread(false)
+    }
+  }
+
   const handleSend = async () => {
     setShouldUpdateThread(false)
 
@@ -131,7 +132,6 @@ export default function ChatBox({
           }
         ]
         const res = await sendMessages(messages)
-        setResponse(res)
 
         const newThread = {
           userId,
@@ -142,14 +142,14 @@ export default function ChatBox({
             {
               id: uuidv4(),
               role: "assistant" as TRole,
-              content: res,
+              content: res.content,
             },
           ]
         }
         const id = await createThread(newThread)
         const thread = await fetchThreadById(id)
         if (thread) {
-          setActiveThread(thread)
+          setShouldUpdateThread(true)
         }
       } else {
         const newMessage = {
@@ -158,7 +158,6 @@ export default function ChatBox({
           content: textareaValue,
         }
         const res = await sendMessages([...activeThread!.messages, newMessage])
-        setResponse(res)
 
         const updatedThread = {
           ...activeThread!,
@@ -168,15 +167,14 @@ export default function ChatBox({
             {
               id: uuidv4(),
               role: "assistant" as TRole,
-              content: res,
+              content: res.content,
             },
           ],
         }
         await updateThread(activeThread!.id, updatedThread)
+        setShouldUpdateThread(true)
       }
-
       setTextareaValue("")
-      setResponse('')
     }
   }
 
