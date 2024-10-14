@@ -119,7 +119,7 @@ export default function ChatList({ threads }: { threads: IThread[] }) {
             >
               {isEditing && targetThread && thread.id === targetThread.id ? (
                 <div className="px-4 py-1">
-                  <input type="text" value={inputVal} onChange={(e) => setInputVal(e.target.value)} className="text-neutral-800 mb-2 p-1" />
+                  <input type="text" value={inputVal} onChange={(e) => setInputVal(e.target.value)} className="block w-full text-neutral-800 mb-2 p-1" />
                   <div className="flex">
                     <Button className="text-sm flex-1 border-2 border-white bg-white text-neutral-800 rounded mr-2" size="small" onClick={handleSave}>
                       Save

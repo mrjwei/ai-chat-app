@@ -14,7 +14,7 @@ export default function LoginForm() {
   return (
     <form action={formAction}>
       <div className="rounded-lg bg-white shadow">
-        <div className="px-12 pb-4 pt-8">
+        <div className="px-12 py-8">
           <h1 className="text-center text-2xl text-slate-400 font-bold mb-12">
             Log in to your account
           </h1>
@@ -25,7 +25,7 @@ export default function LoginForm() {
             labelClassName="col-span-12 font-bold mb-2"
           >
             <input
-              className="col-span-12 border-1 p-2"
+              className="col-span-12 border-2 border-neutral-100 rounded p-2"
               type="email"
               id="email"
               name="email"
@@ -40,7 +40,7 @@ export default function LoginForm() {
             labelClassName="col-span-12 font-bold mb-2"
           >
             <input
-              className="col-span-12 border-1 p-2"
+              className="col-span-12 border-2 border-neutral-100 rounded p-2"
               type="password"
               id="password"
               name="password"
