@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
 import '@/app/globals.css'
-import ChatBox from "@/app/ui/chat/chat-box"
+import { fetchSystemMessages } from "@/app/lib/api"
+import ChatWindow from "@/app/ui/chat/chat-window"
 
 export default async function Page() {
   const session = await auth()
@@ -10,7 +11,9 @@ export default async function Page() {
     redirect('/login')
   }
 
+  const systemMessages = await fetchSystemMessages(session.user.id!)
+
   return (
-    <ChatBox userId={session.user.id!} thread={null} />
+    <ChatWindow thread={null} userId={session.user.id!} systemMessages={systemMessages} />
   )
 }

@@ -160,3 +160,17 @@ export const signIn = async (prevState: any, formData: FormData) => {
 export const signOut = async () => {
   await authSignOut({redirectTo: '/login'})
 }
+
+export const fetchSystemMessages = async (userId: string) => {
+  noStore()
+  const client = await clientPromise
+  const db = client.db('conversation-data')
+  try {
+    return (await db.collection('system-messages').find({userId: new ObjectId(userId)}).toArray()).map(doc => {
+      const {_id, role, content, userId, label} = doc
+      return {id: String(_id), role, content, userId, label}
+    })
+  } catch (error) {
+    console.error('Failed to find system messages: ', error)
+  }
+}

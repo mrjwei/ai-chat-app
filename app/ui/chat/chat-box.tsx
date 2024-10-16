@@ -13,7 +13,7 @@ import {
 import Button from "@/app/ui/common/button"
 import { transcribe, sendMessages, createThread, updateThread, fetchThreadById } from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
-import { SpeakingContext } from "@/app/lib/contexts"
+import { SpeakingContext, SystemMessageContext } from "@/app/lib/contexts"
 
 const ReactMic = dynamic(() => import("react-mic").then((mod) => mod.ReactMic), { ssr: false })
 
@@ -25,6 +25,7 @@ export default function ChatBox({
   thread: IThread | null
 }) {
   const {setIsSpeaking, setActiveMessage} = useContext(SpeakingContext)
+  const {systemMessage} = useContext(SystemMessageContext)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -123,7 +124,7 @@ export default function ChatBox({
           {
             id: uuidv4(),
             role: "system" as TRole,
-            content: 'You are a native English teacher. From now on, please help me practise English speaking for IELTS speaking test. You should ask me 4 to 5 questions in total on a topic about me or things that are closely related to me. You should ask only one question per time and should end our conversation after the specified number of questions by signaling that it is the end for the practice. If relevant, please correct my major mistakes that impede understanding while ignoring minor errors. Please also suggest more idiomatic words and expressions where relevant. Please choose questions as close to the real test as possible and please use UK English instead of US English. After final question, please give me a score based on IELTS 9.0 scale.',
+            content: systemMessage,
           },
           {
             id: uuidv4(),

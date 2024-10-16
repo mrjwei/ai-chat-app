@@ -6,6 +6,12 @@ export interface IMessage {
   content: string
 }
 
+export interface ISystemMessage extends IMessage {
+  role: 'system'
+  userId: string,
+  label: string
+}
+
 export interface IThread {
   id: string
   userId: string
@@ -19,6 +25,11 @@ export type TSpeakingContext = {
   setIsSpeaking: (val: boolean) => void
   activeMessage: IMessage | null
   setActiveMessage: (val: IMessage | null) => void
+}
+
+export type TSystemMessageContext = {
+  systemMessage: string
+  setSystemMessage: (val: string) => void
 }
 
 export interface IUser {
