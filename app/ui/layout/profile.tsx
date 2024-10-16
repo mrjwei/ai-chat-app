@@ -54,11 +54,11 @@ export default function Profile({user}: {user: IUser}) {
       {isProfileMenuOpen && (
         <ul className="absolute w-2/3 bottom-full -translate-y-1 left-0 bg-white shadow-md rounded p-2" ref={profileMenuRef}>
           <li>
-            <Link href="/" className="block text-gray-800 px-2 py-2 rounded hover:bg-gray-100">Setting</Link>
+            <Link href="/setting" className="block text-gray-800 p-2 rounded hover:bg-gray-100">Setting</Link>
           </li>
           <li>
             <form action={signOut}>
-              <Button type="submit" className="w-full px-2 py-2 flex items-center rounded text-gray-800 font-normal hover:bg-gray-100">Sign Out</Button>
+              <Button type="submit" className="w-full !p-2 flex items-center rounded text-gray-800 font-normal hover:bg-gray-100">Sign Out</Button>
             </form>
           </li>
         </ul>
