@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import {usePathname} from 'next/navigation'
-import clsx from "clsx"
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import Button from "@/app/ui/common/button"
 
@@ -34,7 +33,7 @@ export default function SidebarContainer({
       {/* large screen */}
       <div className="hidden lg:col-span-2 lg:block">{children}</div>
       {/* small screen */}
-      <div className="lg:hidden absolute w-full left-0 top-0 z-50">
+      <div className="lg:hidden fixed w-full left-0 top-0 z-50">
         <div className="bg-white shadow">
           <Button onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? (
