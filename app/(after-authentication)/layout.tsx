@@ -1,14 +1,24 @@
 import Sidebar from "@/app/ui/layout/sidebar"
 import SidebarContainer from "@/app/ui/layout/sidebar-container"
+import { fetchSystemMessages } from "@/app/lib/api"
+import { auth } from "@/auth"
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const session = await auth()
+
+  if (!session) {
+    return
+  }
+
+  const systemMessages = await fetchSystemMessages(session.user.id!)
+
   return (
     <div className="flex-1 grid grid-cols-12 relative h-full">
-      <SidebarContainer>
+      <SidebarContainer systemMessages={systemMessages}>
         <Sidebar />
       </SidebarContainer>
       <main className="relative col-span-12 lg:col-span-10 flex flex-col justify-end h-full">
