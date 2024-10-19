@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation"
 import Sidebar from "@/app/ui/layout/sidebar"
 import SidebarContainer from "@/app/ui/layout/sidebar-container"
 import { fetchSystemMessages } from "@/app/lib/api"
@@ -11,7 +12,7 @@ export default async function RootLayout({
   const session = await auth()
 
   if (!session) {
-    return
+    redirect('/login')
   }
 
   const systemMessages = await fetchSystemMessages(session.user.id!)
