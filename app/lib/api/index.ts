@@ -247,3 +247,59 @@ export const createSystemMessage = async (
   }
   revalidatePath(`/setting`)
 }
+
+export const deleteSystemMessage = async (id: string) => {
+  noStore()
+  const client = await clientPromise
+  const db = client.db("conversation-data")
+  try {
+    const collection = db.collection("system-messages")
+    await collection.deleteOne({ _id: new ObjectId(id) })
+  } catch (error) {
+    console.error("Failed to delete system message: ", error)
+  }
+  revalidatePath("/setting")
+}
+
+export const updateSystemMessage = async (id: string, label: string | undefined, content: string | undefined) => {
+  noStore()
+  const client = await clientPromise
+  const db = client.db("conversation-data")
+  try {
+    if (label === undefined && content === undefined) {
+      return
+    }
+    if (label === undefined && content !== undefined) {
+      await db.collection("system-messages").updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            content
+          },
+        }
+      )
+    } else if (label !== undefined && content === undefined) {
+      await db.collection("system-messages").updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            label
+          },
+        }
+      )
+    } else {
+      await db.collection("system-messages").updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            label,
+            content
+          },
+        }
+      )
+    }
+  } catch (error) {
+    console.error("Failed to update system message: ", error)
+  }
+  revalidatePath("/setting")
+}
