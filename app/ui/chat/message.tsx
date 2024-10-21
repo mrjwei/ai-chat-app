@@ -9,11 +9,12 @@ import {
 } from '@heroicons/react/24/solid'
 import Button from "@/app/ui/common/button"
 import { IMessage } from "@/app/lib/types"
-import { SpeakingContext } from "@/app/lib/contexts"
+import { SpeakingContext, VoiceContext } from "@/app/lib/contexts"
 import {utter, cancelUtter} from '@/app/lib/utilities'
 
 export default function Message({message}: {message: IMessage }) {
   const {isSpeaking, setIsSpeaking, activeMessage, setActiveMessage} = useContext(SpeakingContext)
+  const {voiceIndex} = useContext(VoiceContext)
 
   const handleToggle = (message: IMessage) => {
     if (isSpeaking) {
@@ -22,7 +23,7 @@ export default function Message({message}: {message: IMessage }) {
       cancelUtter()
     } else {
       setActiveMessage(message)
-      utter({text: message.content, voiceIndex: 8, onStart: () => setIsSpeaking(true), onEnd: () => setIsSpeaking(false)})
+      utter({text: message.content, voiceIndex, onStart: () => setIsSpeaking(true), onEnd: () => setIsSpeaking(false)})
     }
   }
 

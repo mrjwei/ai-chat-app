@@ -20,7 +20,6 @@ export default function SystemMessageSelect({messages, className}: {messages?: I
       "flex items-center bg-white text-neutral-500 p-4 z-10",
       className
     )}>
-      <label htmlFor="system-message" className="block mr-1">Context:</label>
       {messages === undefined ? (
         <select className="p-2 border-2 border-neutral-200 rounded" disabled>
           <option>No context</option>

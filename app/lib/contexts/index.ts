@@ -1,5 +1,5 @@
 import {createContext} from 'react'
-import {TSpeakingContext, TSystemMessageContext} from '@/app/lib/types'
+import {TSpeakingContext, TSystemMessageContext, TVoiceContext} from '@/app/lib/types'
 
 export const SpeakingContext = createContext<TSpeakingContext>({
   isSpeaking: false,
@@ -11,4 +11,9 @@ export const SpeakingContext = createContext<TSpeakingContext>({
 export const SystemMessageContext = createContext<TSystemMessageContext>({
   systemMessage: '',
   setSystemMessage: () => {}
+})
+
+export const VoiceContext = createContext<TVoiceContext>({
+  voiceIndex: 0,
+  setVoiceIndex: () => {}
 })

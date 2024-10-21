@@ -117,17 +117,16 @@ export const createThread = async (thread: Omit<IThread, "id">) => {
   noStore()
   const client = await clientPromise
   const db = client.db("conversation-data")
-  let id = ""
   try {
     const result = await db
       .collection("threads")
       .insertOne({ ...thread, userId: new ObjectId(thread.userId) })
-    id = String(result.insertedId)
+    const id =  String(result.insertedId)
+    revalidatePath(`/t/${id}`)
+    return id
   } catch (error) {
     console.error("Failed to create design: ", error)
   }
-  revalidatePath(`/t/${id}`)
-  redirect(`/t/${id}`)
 }
 
 export const updateThread = async (id: string, updatedThread: IThread) => {

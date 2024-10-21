@@ -32,6 +32,11 @@ export type TSystemMessageContext = {
   setSystemMessage: (val: string) => void
 }
 
+export type TVoiceContext = {
+  voiceIndex: number
+  setVoiceIndex: (val: number) => void
+}
+
 export interface IUser {
   id: string
   name: string

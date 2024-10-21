@@ -2,17 +2,16 @@
 
 import "regenerator-runtime/runtime"
 import { useState, useContext, useEffect, useRef } from "react"
-import { usePathname } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { v4 as uuidv4 } from "uuid"
 import {
   transcribe,
   sendMessages,
   createThread,
   updateThread,
-  fetchThreadById,
 } from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
-import { SpeakingContext, SystemMessageContext } from "@/app/lib/contexts"
+import { SpeakingContext, SystemMessageContext, VoiceContext } from "@/app/lib/contexts"
 import TextBox from "@/app/ui/chat/text-box"
 import Recorder from "@/app/ui/chat/recorder"
 import { utter } from "@/app/lib/utilities"
@@ -24,44 +23,31 @@ export default function ChatBox({
   userId: string
   thread: IThread | null
 }) {
-  const pathname = usePathname()
+  const router = useRouter()
 
-  const { setIsSpeaking, setActiveMessage } = useContext(SpeakingContext)
+  const { setIsSpeaking, activeMessage, setActiveMessage } = useContext(SpeakingContext)
   const { systemMessage } = useContext(SystemMessageContext)
+  const {voiceIndex} = useContext(VoiceContext)
 
   const shouldTranscribeRef = useRef(false)
-  const hasUtteredRef = useRef(false)
 
   const [record, setRecord] = useState(false)
   const [textareaValue, setTextareaValue] = useState("")
   const [activeThread, setActiveThread] = useState<IThread | null>(thread)
 
   useEffect(() => {
-    if (pathname.startsWith('/t')) {
-      const id = pathname.split('/').slice(-1)[0]
-      fetchThreadById(id)
-        .then(res => {
-          if (res) {
-            setActiveThread(res)
-            setActiveMessage(res.messages.slice(-1)[0])
-            return res
-          }
-        })
-        .then(res => {
-          if (res && !hasUtteredRef.current) {
-            utter({
-              text: res.messages.slice(-1)[0].content,
-              voiceIndex: 8,
-              onStart: () => setIsSpeaking(true),
-              onEnd: () => {
-                setIsSpeaking(false)
-              },
-            })
-            hasUtteredRef.current = true
-          }
-        })
+    if (activeMessage) {
+      utter({
+        text: activeMessage.content,
+        voiceIndex,
+        onStart: () => setIsSpeaking(true),
+        onEnd: () => {
+          setIsSpeaking(false)
+          setActiveMessage(null)
+        },
+      })
     }
-  }, [pathname])
+  }, [activeMessage]);
 
   const handleTranscribe = async (recordedBlob: any) => {
     if (shouldTranscribeRef.current) {
@@ -135,7 +121,12 @@ export default function ChatBox({
           ],
         }
 
-        await createThread(newThread)
+        const id = await createThread(newThread)
+        if (id) {
+          setActiveThread({...newThread, id})
+          setActiveMessage(newThread.messages.slice(-1)[0])
+          router.replace(`/t/${id}`)
+        }
       } else {
         const newMessage = {
           id: uuidv4(),
@@ -159,12 +150,6 @@ export default function ChatBox({
 
         await updateThread(activeThread!.id, updatedThread)
         setActiveMessage(updatedThread.messages.slice(-1)[0])
-        utter({
-          text: updatedThread.messages.slice(-1)[0].content,
-          voiceIndex: 8,
-          onStart: () => setIsSpeaking(true),
-          onEnd: () => setIsSpeaking(false),
-        })
       }
       setTextareaValue("")
     }
