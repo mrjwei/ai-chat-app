@@ -10,12 +10,22 @@ import {
   ArrowPathIcon,
 } from "@heroicons/react/24/solid"
 import Button from "@/app/ui/common/button"
-import { transcribe, sendMessages, createThread, updateThread, fetchThreadById } from "@/app/lib/api"
+import {
+  transcribe,
+  sendMessages,
+  createThread,
+  updateThread,
+  fetchThreadById,
+} from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
 import { SpeakingContext, SystemMessageContext } from "@/app/lib/contexts"
-import TextBox from '@/app/ui/chat/text-box'
+import TextBox from "@/app/ui/chat/text-box"
+import { utter } from "@/app/lib/utilities"
 
-const ReactMic = dynamic(() => import("react-mic").then((mod) => mod.ReactMic), { ssr: false })
+const ReactMic = dynamic(
+  () => import("react-mic").then((mod) => mod.ReactMic),
+  { ssr: false }
+)
 
 export default function ChatBox({
   userId,
@@ -24,8 +34,8 @@ export default function ChatBox({
   userId: string
   thread: IThread | null
 }) {
-  const {setIsSpeaking, setActiveMessage} = useContext(SpeakingContext)
-  const {systemMessage} = useContext(SystemMessageContext)
+  const { setIsSpeaking, setActiveMessage } = useContext(SpeakingContext)
+  const { systemMessage } = useContext(SystemMessageContext)
 
   const shouldTranscribeRef = useRef(false)
 
@@ -42,11 +52,19 @@ export default function ChatBox({
       return await fetchThreadById(activeThread.id)
     }
     if (shouldUpdateThread) {
-      fetchThread().then(res => {
+      fetchThread().then((res) => {
         if (res) {
           setActiveThread(res)
           setActiveMessage(res.messages.slice(-1)[0])
-          utter(res.messages.slice(-1)[0].content)
+          utter({
+            text: res.messages.slice(-1)[0].content,
+            voiceIndex: 8,
+            onStart: () => setIsSpeaking(true),
+            onEnd: () => {
+              setIsSpeaking(false)
+              setShouldUpdateThread(false)
+            }
+          })
         }
       })
     }
@@ -64,17 +82,18 @@ export default function ChatBox({
   const handleTranscribe = async (recordedBlob: any) => {
     if (shouldTranscribeRef.current) {
       const transcript = await transcribe(recordedBlob.blob)
-      setTextareaValue(prev => {
-        if (transcript.endsWith(".") ||
-            transcript.endsWith(",") ||
-            transcript.endsWith(";") ||
-            transcript.endsWith(":") ||
-            transcript.endsWith("?") ||
-            transcript.endsWith("!")
+      setTextareaValue((prev) => {
+        if (
+          transcript.endsWith(".") ||
+          transcript.endsWith(",") ||
+          transcript.endsWith(";") ||
+          transcript.endsWith(":") ||
+          transcript.endsWith("?") ||
+          transcript.endsWith("!")
         ) {
-          return prev + transcript + ' '
+          return prev + transcript + " "
         } else {
-          return prev + transcript + '. '
+          return prev + transcript + ". "
         }
       })
     }
@@ -85,20 +104,6 @@ export default function ChatBox({
     shouldTranscribeRef.current = false
     setRecord(false)
     setTextareaValue("")
-  }
-
-  const utter = (text: string) => {
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.onstart = () => {
-      setIsSpeaking(true)
-    }
-    utterance.lang = "en-GB"
-    utterance.voice = window.speechSynthesis.getVoices()[8]
-    window.speechSynthesis.speak(utterance)
-    utterance.onend = () => {
-      setIsSpeaking(false)
-      setShouldUpdateThread(false)
-    }
   }
 
   const handleChange = (text: string) => {
@@ -119,9 +124,9 @@ export default function ChatBox({
           },
           {
             id: uuidv4(),
-            role: 'user' as TRole,
-            content: textareaValue
-          }
+            role: "user" as TRole,
+            content: textareaValue,
+          },
         ]
         const res = await sendMessages(messages)
 
@@ -136,7 +141,7 @@ export default function ChatBox({
               role: "assistant" as TRole,
               content: res.content,
             },
-          ]
+          ],
         }
         const id = await createThread(newThread)
         const thread = await fetchThreadById(id)
@@ -194,7 +199,11 @@ export default function ChatBox({
           <ArrowPathIcon className="w-8" />
         </Button>
       </div>
-      <TextBox value={textareaValue} handleChange={handleChange} handleSend={handleSend} />
+      <TextBox
+        value={textareaValue}
+        handleChange={handleChange}
+        handleSend={handleSend}
+      />
     </div>
   )
 }

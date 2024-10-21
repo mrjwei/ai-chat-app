@@ -15,7 +15,7 @@ export default function Message({isActive, message, handleToggle, isSpeaking}: {
     <div
       className={clsx("max-w-full p-4 rounded-md shadow", {
         "bg-gray-100": message.role === "user",
-        "bg-blue-100": message.role === "assistant",
+        "bg-blue-50": message.role === "assistant",
       })}
     >
       {message.role === "assistant" ? (
