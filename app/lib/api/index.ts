@@ -16,6 +16,7 @@ export const transcribe = async (audioBlob: Blob) => {
   const formData = new FormData()
   formData.append("file", audioBlob, "audio.wav")
   formData.append("model", "whisper-1")
+  formData.append("language", "en")
 
   try {
     const response = await axios.post(
