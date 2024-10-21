@@ -8,12 +8,12 @@ import {
   PlayCircleIcon,
   StopCircleIcon,
   ArrowPathIcon,
-  ArrowUpCircleIcon,
 } from "@heroicons/react/24/solid"
 import Button from "@/app/ui/common/button"
 import { transcribe, sendMessages, createThread, updateThread, fetchThreadById } from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
 import { SpeakingContext, SystemMessageContext } from "@/app/lib/contexts"
+import TextBox from '@/app/ui/chat/text-box'
 
 const ReactMic = dynamic(() => import("react-mic").then((mod) => mod.ReactMic), { ssr: false })
 
@@ -27,25 +27,12 @@ export default function ChatBox({
   const {setIsSpeaking, setActiveMessage} = useContext(SpeakingContext)
   const {systemMessage} = useContext(SystemMessageContext)
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-
   const shouldTranscribeRef = useRef(false)
 
   const [record, setRecord] = useState(false)
   const [textareaValue, setTextareaValue] = useState("")
   const [activeThread, setActiveThread] = useState<IThread | null>(thread)
   const [shouldUpdateThread, setShouldUpdateThread] = useState(false)
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      if (textareaValue === "") {
-        textareaRef.current.style.height = "auto"
-      } else {
-        const height = textareaRef.current.scrollHeight
-        textareaRef.current.style.height = height + "px"
-      }
-    }
-  }, [textareaValue])
 
   useEffect(() => {
     const fetchThread = async () => {
@@ -112,6 +99,10 @@ export default function ChatBox({
       setIsSpeaking(false)
       setShouldUpdateThread(false)
     }
+  }
+
+  const handleChange = (text: string) => {
+    setTextareaValue(text)
   }
 
   const handleSend = async () => {
@@ -203,16 +194,7 @@ export default function ChatBox({
           <ArrowPathIcon className="w-8" />
         </Button>
       </div>
-      <textarea
-        ref={textareaRef}
-        className="block flex-1 min-w-40 lg:max-w-[40rem] p-2 rounded-md -translate-x-[7.5px] mr-1"
-        value={textareaValue}
-        onChange={(e) => setTextareaValue(e.target.value)}
-        placeholder="Record or type your message..."
-      ></textarea>
-      <Button onClick={handleSend} className="!p-2">
-        <ArrowUpCircleIcon className="w-8" />
-      </Button>
+      <TextBox value={textareaValue} handleChange={handleChange} handleSend={handleSend} />
     </div>
   )
 }
