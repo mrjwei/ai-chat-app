@@ -6,7 +6,7 @@ import {IMessage} from '@/app/lib/types'
 import Message from '@/app/ui/chat/message'
 import { SpeakingContext } from "@/app/lib/contexts"
 
-export default function Messages({thread}: {thread: any}) {
+export default function Thread({thread}: {thread: any}) {
   const {isSpeaking, setIsSpeaking, activeMessage, setActiveMessage} = useContext(SpeakingContext)
 
   const handleToggle = (message: IMessage) => {
