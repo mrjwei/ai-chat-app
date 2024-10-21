@@ -2,14 +2,7 @@
 
 import "regenerator-runtime/runtime"
 import { useState, useContext, useEffect, useRef } from "react"
-import dynamic from "next/dynamic"
 import { v4 as uuidv4 } from "uuid"
-import {
-  PlayCircleIcon,
-  StopCircleIcon,
-  ArrowPathIcon,
-} from "@heroicons/react/24/solid"
-import Button from "@/app/ui/common/button"
 import {
   transcribe,
   sendMessages,
@@ -20,12 +13,8 @@ import {
 import { TRole, IThread } from "@/app/lib/types"
 import { SpeakingContext, SystemMessageContext } from "@/app/lib/contexts"
 import TextBox from "@/app/ui/chat/text-box"
+import Recorder from "@/app/ui/chat/recorder"
 import { utter } from "@/app/lib/utilities"
-
-const ReactMic = dynamic(
-  () => import("react-mic").then((mod) => mod.ReactMic),
-  { ssr: false }
-)
 
 export default function ChatBox({
   userId,
@@ -63,21 +52,12 @@ export default function ChatBox({
             onEnd: () => {
               setIsSpeaking(false)
               setShouldUpdateThread(false)
-            }
+            },
           })
         }
       })
     }
   }, [shouldUpdateThread])
-
-  const handleStart = () => {
-    setRecord(true)
-  }
-
-  const handleStop = () => {
-    shouldTranscribeRef.current = true
-    setRecord(false)
-  }
 
   const handleTranscribe = async (recordedBlob: any) => {
     if (shouldTranscribeRef.current) {
@@ -98,6 +78,15 @@ export default function ChatBox({
       })
     }
     shouldTranscribeRef.current = false
+  }
+
+  const handleStart = () => {
+    setRecord(true)
+  }
+
+  const handleStop = () => {
+    shouldTranscribeRef.current = true
+    setRecord(false)
   }
 
   const handleReset = () => {
@@ -177,28 +166,13 @@ export default function ChatBox({
 
   return (
     <div className="sticky bottom-0 right-0 px-4 lg:px-8 py-4 w-full bg-gray-100 shadow flex items-stretch justify-center z-40">
-      <ReactMic
+      <Recorder
         record={record}
-        className="hidden"
-        onStop={handleTranscribe}
-        mimeType="audio/wav"
-        strokeColor="#000"
-        backgroundColor="#FF4081"
+        handleStart={handleStart}
+        handleStop={handleStop}
+        handleReset={handleReset}
+        handleTranscribe={handleTranscribe}
       />
-      <div className="flex mr-1">
-        {record ? (
-          <Button onClick={handleStop} className="text-red-500 !p-2">
-            <StopCircleIcon className="w-8" />
-          </Button>
-        ) : (
-          <Button onClick={handleStart} className="!p-2">
-            <PlayCircleIcon className="w-8" />
-          </Button>
-        )}
-        <Button onClick={handleReset} className="!p-2">
-          <ArrowPathIcon className="w-8" />
-        </Button>
-      </div>
       <TextBox
         value={textareaValue}
         handleChange={handleChange}
