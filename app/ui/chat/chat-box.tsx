@@ -2,6 +2,7 @@
 
 import "regenerator-runtime/runtime"
 import { useState, useContext, useEffect, useRef } from "react"
+import { usePathname } from "next/navigation"
 import { v4 as uuidv4 } from "uuid"
 import {
   transcribe,
@@ -23,41 +24,44 @@ export default function ChatBox({
   userId: string
   thread: IThread | null
 }) {
+  const pathname = usePathname()
+
   const { setIsSpeaking, setActiveMessage } = useContext(SpeakingContext)
   const { systemMessage } = useContext(SystemMessageContext)
 
   const shouldTranscribeRef = useRef(false)
+  const hasUtteredRef = useRef(false)
 
   const [record, setRecord] = useState(false)
   const [textareaValue, setTextareaValue] = useState("")
   const [activeThread, setActiveThread] = useState<IThread | null>(thread)
-  const [shouldUpdateThread, setShouldUpdateThread] = useState(false)
 
   useEffect(() => {
-    const fetchThread = async () => {
-      if (!activeThread) {
-        return null
-      }
-      return await fetchThreadById(activeThread.id)
+    if (pathname.startsWith('/t')) {
+      const id = pathname.split('/').slice(-1)[0]
+      fetchThreadById(id)
+        .then(res => {
+          if (res) {
+            setActiveThread(res)
+            setActiveMessage(res.messages.slice(-1)[0])
+            return res
+          }
+        })
+        .then(res => {
+          if (res && !hasUtteredRef.current) {
+            utter({
+              text: res.messages.slice(-1)[0].content,
+              voiceIndex: 8,
+              onStart: () => setIsSpeaking(true),
+              onEnd: () => {
+                setIsSpeaking(false)
+              },
+            })
+            hasUtteredRef.current = true
+          }
+        })
     }
-    if (shouldUpdateThread) {
-      fetchThread().then((res) => {
-        if (res) {
-          setActiveThread(res)
-          setActiveMessage(res.messages.slice(-1)[0])
-          utter({
-            text: res.messages.slice(-1)[0].content,
-            voiceIndex: 8,
-            onStart: () => setIsSpeaking(true),
-            onEnd: () => {
-              setIsSpeaking(false)
-              setShouldUpdateThread(false)
-            },
-          })
-        }
-      })
-    }
-  }, [shouldUpdateThread])
+  }, [pathname])
 
   const handleTranscribe = async (recordedBlob: any) => {
     if (shouldTranscribeRef.current) {
@@ -100,8 +104,6 @@ export default function ChatBox({
   }
 
   const handleSend = async () => {
-    setShouldUpdateThread(false)
-
     if (textareaValue) {
       if (thread === null) {
         // create thread
@@ -132,11 +134,8 @@ export default function ChatBox({
             },
           ],
         }
-        const id = await createThread(newThread)
-        const thread = await fetchThreadById(id)
-        if (thread) {
-          setShouldUpdateThread(true)
-        }
+
+        await createThread(newThread)
       } else {
         const newMessage = {
           id: uuidv4(),
@@ -157,8 +156,15 @@ export default function ChatBox({
             },
           ],
         }
+
         await updateThread(activeThread!.id, updatedThread)
-        setShouldUpdateThread(true)
+        setActiveMessage(updatedThread.messages.slice(-1)[0])
+        utter({
+          text: updatedThread.messages.slice(-1)[0].content,
+          voiceIndex: 8,
+          onStart: () => setIsSpeaking(true),
+          onEnd: () => setIsSpeaking(false),
+        })
       }
       setTextareaValue("")
     }
