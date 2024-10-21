@@ -1,5 +1,6 @@
 "use client"
 
+import { useContext } from "react"
 import Markdown from "react-markdown"
 import clsx from "clsx"
 import {
@@ -8,8 +9,22 @@ import {
 } from '@heroicons/react/24/solid'
 import Button from "@/app/ui/common/button"
 import { IMessage } from "@/app/lib/types"
+import { SpeakingContext } from "@/app/lib/contexts"
+import {utter, cancelUtter} from '@/app/lib/utilities'
 
-export default function Message({isActive, message, handleToggle, isSpeaking}: {isActive: boolean, message: IMessage, handleToggle: (message: IMessage) => void, isSpeaking: boolean }) {
+export default function Message({message}: {message: IMessage }) {
+  const {isSpeaking, setIsSpeaking, activeMessage, setActiveMessage} = useContext(SpeakingContext)
+
+  const handleToggle = (message: IMessage) => {
+    if (isSpeaking) {
+      setIsSpeaking(false)
+      setActiveMessage(null)
+      cancelUtter()
+    } else {
+      setActiveMessage(message)
+      utter({text: message.content, voiceIndex: 8, onStart: () => setIsSpeaking(true), onEnd: () => setIsSpeaking(false)})
+    }
+  }
 
   return (
     <div
@@ -27,10 +42,10 @@ export default function Message({isActive, message, handleToggle, isSpeaking}: {
             id={message.id}
             onClick={() => handleToggle(message)}
             className={clsx("block h-full", {
-              "text-red-500": isSpeaking && isActive
+              "text-red-500": isSpeaking && activeMessage?.id === message.id
             })}
           >
-            {(isSpeaking && isActive) ? (
+            {(isSpeaking && activeMessage?.id === message.id) ? (
               <StopCircleIcon className="w-6" />
             ) : (
               <ArrowPathIcon className="w-6" />
