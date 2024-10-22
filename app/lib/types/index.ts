@@ -20,23 +20,6 @@ export interface IThread {
   messages: IMessage[]
 }
 
-export type TSpeakingContext = {
-  isSpeaking: boolean
-  setIsSpeaking: (val: boolean) => void
-  activeMessage: IMessage | null
-  setActiveMessage: (val: IMessage | null) => void
-}
-
-export type TSystemMessageContext = {
-  systemMessage: string
-  setSystemMessage: (val: string) => void
-}
-
-export type TVoiceContext = {
-  voiceIndex: number
-  setVoiceIndex: (val: number) => void
-}
-
 export interface IUser {
   id: string
   name: string
@@ -44,3 +27,19 @@ export interface IUser {
   password: string
   threads?: IThread[]
 }
+
+export interface ISpeakingMessageState {
+  speakingMessage: IMessage | null
+  setSpeakingMessage: (message: IMessage | null) => void
+}
+
+export interface IVoiceState {
+  voiceIndex: number
+  changeVoiceIndex: (newIndex: number) => void
+}
+
+export interface ISystemMessageState {
+  systemMessage: string
+  changeSystemMessage: (newMessage: string) => void
+}
+

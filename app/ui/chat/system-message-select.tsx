@@ -1,18 +1,22 @@
 'use client'
 
-import {useContext, useEffect} from 'react'
+import {useEffect} from 'react'
+import {useShallow} from 'zustand/shallow'
 import clsx from 'clsx'
 import {ISystemMessage} from '@/app/lib/types'
-import { SystemMessageContext } from "@/app/lib/contexts"
+import {useSystemMessageStore} from '@/app/lib/stores'
 
 export default function SystemMessageSelect({messages, className}: {messages?: ISystemMessage[], className?: string}) {
-  const {systemMessage, setSystemMessage} = useContext(SystemMessageContext)
+  const {systemMessage, changeSystemMessage} = useSystemMessageStore(useShallow((state) => ({
+    systemMessage: state.systemMessage,
+    changeSystemMessage: state.changeSystemMessage
+  })))
 
   useEffect(() => {
     if (messages === undefined) {
       return
     }
-    setSystemMessage(messages[0].content)
+    changeSystemMessage(messages[0].content)
   }, []);
 
   return (
@@ -25,7 +29,7 @@ export default function SystemMessageSelect({messages, className}: {messages?: I
           <option>No context</option>
         </select>
       ) : (
-        <select className="p-2 border-2 border-neutral-200 rounded" onChange={(e) => setSystemMessage(e.target.value)} value={systemMessage}>
+        <select className="p-2 border-2 border-neutral-200 rounded" onChange={(e) => changeSystemMessage(e.target.value)} value={systemMessage}>
           {messages.map(message => {
             const {id, content, label} = message
             return (

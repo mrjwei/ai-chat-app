@@ -1,7 +1,7 @@
 "use client"
 
 import "regenerator-runtime/runtime"
-import { useState, useContext, useEffect, useRef } from "react"
+import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { v4 as uuidv4 } from "uuid"
 import {
@@ -11,10 +11,10 @@ import {
   updateThread,
 } from "@/app/lib/api"
 import { TRole, IThread } from "@/app/lib/types"
-import { SpeakingContext, SystemMessageContext, VoiceContext } from "@/app/lib/contexts"
 import TextBox from "@/app/ui/chat/text-box"
 import Recorder from "@/app/ui/chat/recorder"
 import { utter } from "@/app/lib/utilities"
+import {useSpeakingMessageStore, useVoiceStore, useSystemMessageStore} from '@/app/lib/stores'
 
 export default function ChatBox({
   userId,
@@ -25,29 +25,14 @@ export default function ChatBox({
 }) {
   const router = useRouter()
 
-  const { setIsSpeaking, activeMessage, setActiveMessage } = useContext(SpeakingContext)
-  const { systemMessage } = useContext(SystemMessageContext)
-  const {voiceIndex} = useContext(VoiceContext)
+  const setSpeakingMessage = useSpeakingMessageStore((state) => state.setSpeakingMessage)
+  const voiceIndex = useVoiceStore((state) => state.voiceIndex)
+  const systemMessage = useSystemMessageStore((state) => state.systemMessage)
 
   const shouldTranscribeRef = useRef(false)
 
   const [record, setRecord] = useState(false)
   const [textareaValue, setTextareaValue] = useState("")
-  const [activeThread, setActiveThread] = useState<IThread | null>(thread)
-
-  useEffect(() => {
-    if (activeMessage) {
-      utter({
-        text: activeMessage.content,
-        voiceIndex,
-        onStart: () => setIsSpeaking(true),
-        onEnd: () => {
-          setIsSpeaking(false)
-          setActiveMessage(null)
-        },
-      })
-    }
-  }, [activeMessage]);
 
   const handleTranscribe = async (recordedBlob: any) => {
     if (shouldTranscribeRef.current) {
@@ -123,9 +108,14 @@ export default function ChatBox({
 
         const id = await createThread(newThread)
         if (id) {
-          setActiveThread({...newThread, id})
-          setActiveMessage(newThread.messages.slice(-1)[0])
           router.replace(`/t/${id}`)
+          setSpeakingMessage(newThread.messages.slice(-1)[0])
+          utter({
+            text: newThread.messages.slice(-1)[0].content,
+            voiceIndex,
+            onStart: null,
+            onEnd: () => setSpeakingMessage(null),
+          })
         }
       } else {
         const newMessage = {
@@ -133,12 +123,12 @@ export default function ChatBox({
           role: "user" as TRole,
           content: textareaValue,
         }
-        const res = await sendMessages([...activeThread!.messages, newMessage])
+        const res = await sendMessages([...thread.messages, newMessage])
 
         const updatedThread = {
-          ...activeThread!,
+          ...thread!,
           messages: [
-            ...activeThread!.messages,
+            ...thread!.messages,
             newMessage,
             {
               id: uuidv4(),
@@ -148,8 +138,14 @@ export default function ChatBox({
           ],
         }
 
-        await updateThread(activeThread!.id, updatedThread)
-        setActiveMessage(updatedThread.messages.slice(-1)[0])
+        await updateThread(thread!.id, updatedThread)
+        setSpeakingMessage(updatedThread.messages.slice(-1)[0])
+        utter({
+          text: updatedThread.messages.slice(-1)[0].content,
+          voiceIndex,
+          onStart: null,
+          onEnd: () => setSpeakingMessage(null),
+        })
       }
       setTextareaValue("")
     }

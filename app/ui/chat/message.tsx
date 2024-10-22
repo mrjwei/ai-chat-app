@@ -1,32 +1,12 @@
 "use client"
 
-import { useContext } from "react"
 import Markdown from "react-markdown"
 import clsx from "clsx"
-import {
-  StopCircleIcon,
-  ArrowPathIcon,
-} from '@heroicons/react/24/solid'
+import { StopCircleIcon, ArrowPathIcon } from "@heroicons/react/24/solid"
 import Button from "@/app/ui/common/button"
 import { IMessage } from "@/app/lib/types"
-import { SpeakingContext, VoiceContext } from "@/app/lib/contexts"
-import {utter, cancelUtter} from '@/app/lib/utilities'
 
-export default function Message({message}: {message: IMessage }) {
-  const {isSpeaking, setIsSpeaking, activeMessage, setActiveMessage} = useContext(SpeakingContext)
-  const {voiceIndex} = useContext(VoiceContext)
-
-  const handleToggle = (message: IMessage) => {
-    if (isSpeaking) {
-      setIsSpeaking(false)
-      setActiveMessage(null)
-      cancelUtter()
-    } else {
-      setActiveMessage(message)
-      utter({text: message.content, voiceIndex, onStart: () => setIsSpeaking(true), onEnd: () => setIsSpeaking(false)})
-    }
-  }
-
+export default function Message({ message, isActive, handleClick }: { message: IMessage, isActive: boolean, handleClick: (message: IMessage) => void }) {
   return (
     <div
       className={clsx("max-w-full p-4 rounded-md shadow", {
@@ -41,12 +21,12 @@ export default function Message({message}: {message: IMessage }) {
           </div>
           <Button
             id={message.id}
-            onClick={() => handleToggle(message)}
+            onClick={() => handleClick(message)}
             className={clsx("block h-full", {
-              "text-red-500": isSpeaking && activeMessage?.id === message.id
+              "text-red-500": isActive,
             })}
           >
-            {(isSpeaking && activeMessage?.id === message.id) ? (
+            {isActive ? (
               <StopCircleIcon className="w-6" />
             ) : (
               <ArrowPathIcon className="w-6" />

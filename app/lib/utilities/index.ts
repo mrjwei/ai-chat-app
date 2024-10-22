@@ -1,4 +1,4 @@
-export const utter = ({text, voiceIndex, onStart, onEnd}: {text: string, voiceIndex: number, onStart: () => void | null, onEnd: () => void | null}) => {
+export const utter = ({text, voiceIndex, onStart, onEnd}: {text: string, voiceIndex: number, onStart: (() => void) | null, onEnd: (() => void) | null}) => {
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.onstart = onStart
   utterance.lang = "en-GB"

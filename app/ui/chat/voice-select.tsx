@@ -1,11 +1,14 @@
 "use client"
 
-import { useContext } from "react"
+import {useShallow} from 'zustand/shallow'
 import clsx from "clsx"
-import { VoiceContext } from "@/app/lib/contexts"
+import {useVoiceStore} from '@/app/lib/stores'
 
 export default function VoiceSelect({className}: {className?: string}) {
-  const {voiceIndex, setVoiceIndex} = useContext(VoiceContext)
+  const {voiceIndex, changeVoiceIndex} = useVoiceStore(useShallow((state) => ({
+    voiceIndex: state.voiceIndex,
+    changeVoiceIndex: state.changeVoiceIndex
+  })))
 
   return (
     <div
@@ -16,7 +19,7 @@ export default function VoiceSelect({className}: {className?: string}) {
     >
       <select
         className="p-2 border-2 border-neutral-200 rounded"
-        onChange={(e) => setVoiceIndex(Number(e.target.value))}
+        onChange={(e) => changeVoiceIndex(Number(e.target.value))}
         value={voiceIndex}
       >
         {window.speechSynthesis.getVoices().map((voice, i) => {
