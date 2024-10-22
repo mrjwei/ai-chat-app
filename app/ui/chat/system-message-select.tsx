@@ -16,20 +16,22 @@ export default function SystemMessageSelect({messages, className}: {messages?: I
     if (messages === undefined) {
       return
     }
-    changeSystemMessage(messages[0].content)
+    if (systemMessage === "") {
+      changeSystemMessage(messages[0].content)
+    }
   }, []);
 
   return (
     <div className={clsx(
-      "flex items-center bg-white text-neutral-500 p-4 z-10",
+      "flex items-center bg-white text-neutral-500 p-2 z-10 max-w-44 lg:max-w-96",
       className
     )}>
       {messages === undefined ? (
-        <select className="p-2 border-2 border-neutral-200 rounded" disabled>
+        <select className="block w-full p-2 border-2 border-neutral-200 rounded overflow-hidden text-ellipsis" disabled>
           <option>No context</option>
         </select>
       ) : (
-        <select className="p-2 border-2 border-neutral-200 rounded" onChange={(e) => changeSystemMessage(e.target.value)} value={systemMessage}>
+        <select className="block w-full p-2 border-2 border-neutral-200 rounded overflow-hidden text-ellipsis" onChange={(e) => changeSystemMessage(e.target.value)} value={systemMessage}>
           {messages.map(message => {
             const {id, content, label} = message
             return (

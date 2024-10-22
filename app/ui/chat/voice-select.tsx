@@ -13,12 +13,12 @@ export default function VoiceSelect({className}: {className?: string}) {
   return (
     <div
       className={clsx(
-        "flex items-center bg-white text-neutral-500 p-4 z-10",
+        "flex items-center bg-white text-neutral-500 p-2 z-10 max-w-44 lg:max-w-96",
         className
       )}
     >
       <select
-        className="p-2 border-2 border-neutral-200 rounded"
+        className="block w-full p-2 border-2 border-neutral-200 rounded overflow-hidden text-ellipsis"
         onChange={(e) => changeVoiceIndex(Number(e.target.value))}
         value={voiceIndex}
       >
