@@ -21,10 +21,6 @@ export default function ChatWindow({
 
   return (
     <>
-      <div className="hidden w-full fixed top-0 shadow bg-white lg:flex lg:items-center">
-        <SystemMessageSelect messages={systemMessages} />
-        <VoiceSelect />
-      </div>
       {pathname.startsWith("/t") && <Thread thread={thread} />}
       <ChatBox userId={userId} thread={thread} />
     </>

@@ -11,7 +11,7 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="relative h-full px-8 py-16">
+    <div className="relative h-full px-8 pt-24">
       {children}
     </div>
   );

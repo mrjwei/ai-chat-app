@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation"
 import Sidebar from "@/app/ui/layout/sidebar"
-import SidebarContainer from "@/app/ui/layout/sidebar-container"
-import { fetchSystemMessages } from "@/app/lib/api"
+import Header from "@/app/ui/layout/header"
+import { fetchSystemMessages, fetchThreads } from "@/app/lib/api"
 import { auth } from "@/auth"
+import { IThread, IUser } from "@/app/lib/types"
 
 export default async function RootLayout({
   children,
@@ -16,15 +17,17 @@ export default async function RootLayout({
   }
 
   const systemMessages = await fetchSystemMessages(session.user.id!)
+  const threads = (await fetchThreads(session.user.id!)) as IThread[]
 
   return (
-    <div className="flex-1 grid grid-cols-12 relative h-full">
-      <SidebarContainer systemMessages={systemMessages}>
-        <Sidebar />
-      </SidebarContainer>
-      <main className="relative col-span-12 lg:col-span-10 flex flex-col justify-end h-full">
-        {children}
-      </main>
+    <div className="h-full">
+      <Header systemMessages={systemMessages} />
+      <div className="lg:flex h-full bg-white">
+        <Sidebar threads={threads} user={session.user as IUser} />
+        <main className="relative flex-1 flex flex-col justify-end h-full">
+          {children}
+        </main>
+      </div>
     </div>
   )
 }

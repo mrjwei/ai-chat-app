@@ -8,7 +8,7 @@ import { IThread } from "@/app/lib/types"
 import Button from "@/app/ui/common/button"
 import { deleteThread, updateThread } from "@/app/lib/api"
 
-export default function ChatList({ threads }: { threads: IThread[] }) {
+export default function ThreadList({ threads }: { threads: IThread[] }) {
   const displayedThreadId = usePathname().split('/').slice(-1)[0]
   const router = useRouter()
 
@@ -135,7 +135,7 @@ export default function ChatList({ threads }: { threads: IThread[] }) {
                   className={clsx(
                     "block w-full whitespace-nowrap overflow-hidden text-ellipsis px-4 py-1 rounded",
                     {
-                      'bg-gray-600': displayedThreadId === thread.id
+                      'bg-neutral-600': displayedThreadId === thread.id
                     }
                   )}
                 >
@@ -150,7 +150,7 @@ export default function ChatList({ threads }: { threads: IThread[] }) {
         <ul
           className="absolute bg-white text-neutral-800 shadow rounded"
           style={{
-            top: `${menuPos.y + 12}px`,
+            top: `${menuPos.y - 36}px`,
             left: `${menuPos.x + 12}px`,
           }}
         >

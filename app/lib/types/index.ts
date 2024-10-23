@@ -39,7 +39,12 @@ export interface IVoiceState {
 }
 
 export interface ISystemMessageState {
-  systemMessage: string
-  changeSystemMessage: (newMessage: string) => void
+  systemMessage: ISystemMessage | null
+  changeSystemMessage: (newMessage: ISystemMessage) => void
+}
+
+export interface IMenuState {
+  isOpen: boolean
+  setIsOpen: (val: boolean) => void
 }
 

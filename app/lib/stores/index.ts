@@ -5,6 +5,8 @@ import {
   ISpeakingMessageState,
   IVoiceState,
   ISystemMessageState,
+  IMenuState,
+  ISystemMessage
 } from "@/app/lib/types"
 
 export const useSpeakingMessageStore = create<ISpeakingMessageState>()(
@@ -33,8 +35,8 @@ export const useVoiceStore = create<IVoiceState>()(
 export const useSystemMessageStore = create<ISystemMessageState>()(
   persist(
     (set) => ({
-      systemMessage: "",
-      changeSystemMessage: (newMessage: string) =>
+      systemMessage: null,
+      changeSystemMessage: (newMessage: ISystemMessage) =>
         set((state) => ({
           systemMessage: newMessage,
         })),
@@ -44,3 +46,8 @@ export const useSystemMessageStore = create<ISystemMessageState>()(
     }
   )
 )
+
+export const useMenuStore = create<IMenuState>()((set) => ({
+  isOpen: true,
+  setIsOpen: (val: boolean) => set({isOpen: val})
+}))

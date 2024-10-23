@@ -82,7 +82,7 @@ export default function ChatBox({
           {
             id: uuidv4(),
             role: "system" as TRole,
-            content: systemMessage,
+            content: systemMessage!.content,
           },
           {
             id: uuidv4(),
@@ -152,7 +152,7 @@ export default function ChatBox({
   }
 
   return (
-    <div className="sticky bottom-0 right-0 px-4 lg:px-8 py-4 w-full bg-gray-100 shadow flex items-stretch justify-center z-40">
+    <div className="sticky bottom-0 right-0 px-4 lg:px-8 py-4 w-full bg-gray-100 shadow flex items-stretch justify-center z-30">
       <Recorder
         record={record}
         handleStart={handleStart}
