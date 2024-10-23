@@ -6,10 +6,11 @@ import {useShallow} from 'zustand/shallow'
 import Button from '@/app/ui/common/button'
 import SystemMessageSelect from '@/app/ui/chat/system-message-select'
 import VoiceSelect from '@/app/ui/chat/voice-select'
-import { ISystemMessage } from "@/app/lib/types"
+import { ISystemMessage, IUser } from "@/app/lib/types"
 import {useMenuStore} from '@/app/lib/stores'
+import Profile from "@/app/ui/layout/profile"
 
-export default function Header({systemMessages}: {systemMessages: ISystemMessage[] | undefined}) {
+export default function Header({systemMessages, user}: {systemMessages: ISystemMessage[] | undefined, user: IUser}) {
   const {isOpen, setIsOpen} = useMenuStore(
     useShallow((state) => ({
       isOpen: state.isOpen,
@@ -36,6 +37,7 @@ export default function Header({systemMessages}: {systemMessages: ISystemMessage
         <Link href='/' className="px-4 py-2">
           <PlusIcon className="w-6" />
         </Link>
+        <Profile user={user} />
       </div>
     </header>
   )

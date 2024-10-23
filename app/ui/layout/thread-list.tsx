@@ -8,7 +8,7 @@ import { IThread } from "@/app/lib/types"
 import Button from "@/app/ui/common/button"
 import { deleteThread, updateThread } from "@/app/lib/api"
 
-export default function ThreadList({ threads }: { threads: IThread[] }) {
+export default function ThreadList({ threads, className }: { threads: IThread[], className?: string }) {
   const displayedThreadId = usePathname().split('/').slice(-1)[0]
   const router = useRouter()
 
@@ -106,7 +106,7 @@ export default function ThreadList({ threads }: { threads: IThread[] }) {
   }
 
   return (
-    <>
+    <div className={clsx(className)}>
       <ul>
         {threads.map((thread) => {
           return (
@@ -169,6 +169,6 @@ export default function ThreadList({ threads }: { threads: IThread[] }) {
           })}
         </ul>
       )}
-    </>
+    </div>
   )
 }

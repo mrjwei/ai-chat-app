@@ -21,9 +21,9 @@ export default async function RootLayout({
 
   return (
     <div className="h-full">
-      <Header systemMessages={systemMessages} />
+      <Header systemMessages={systemMessages} user={session.user as IUser} />
       <div className="lg:flex h-full bg-white">
-        <Sidebar threads={threads} user={session.user as IUser} />
+        <Sidebar threads={threads} />
         <main className="relative flex-1 flex flex-col justify-end h-full">
           {children}
         </main>

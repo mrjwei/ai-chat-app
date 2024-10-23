@@ -11,9 +11,9 @@ export default function Profile({ user }: { user: IUser }) {
     <div className="relative w-full">
       <Dropdown
         initialLabel={user.name}
-        btnClassName="text-white !w-full"
-        btnClassNameOnOpen="bg-neutral-600"
-        menuClassName="absolute w-2/3 bottom-full -translate-y-1 left-0"
+        btnClassName="w-28"
+        btnClassNameOnOpen="bg-neutral-100"
+        menuClassName="absolute top-full right-0 z-50 translate-y-2"
       >
         <>
           <li>

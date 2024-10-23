@@ -5,11 +5,10 @@ import {useShallow} from 'zustand/shallow'
 import {usePathname} from 'next/navigation'
 import clsx from "clsx"
 import ThreadList from "@/app/ui/layout/thread-list"
-import Profile from "@/app/ui/layout/profile"
-import { IThread, IUser } from "@/app/lib/types"
+import { IThread } from "@/app/lib/types"
 import {useMenuStore} from '@/app/lib/stores'
 
-export default function Sidebar({threads, user}: {threads: IThread[], user: IUser}) {
+export default function Sidebar({threads}: {threads: IThread[]}) {
   const pathname = usePathname()
 
   const {isOpen, setIsOpen} = useMenuStore(useShallow((state) => ({
@@ -34,10 +33,9 @@ export default function Sidebar({threads, user}: {threads: IThread[], user: IUse
 
   return (
     <aside className={clsx(
-      `${isOpen ? 'flex' : 'hidden'} bg-neutral-800 text-white flex-col justify-between p-4 text-sm absolute w-full z-40 lg:w-72 h-[calc(100vh-48px)] lg:sticky top-[48px]`
+      `${isOpen ? 'block' : 'hidden'} bg-neutral-800 text-white p-4 text-sm absolute w-full z-40 lg:w-72 h-[calc(100vh-48px)] lg:sticky top-[48px]`
     )}>
-      <ThreadList threads={threads} />
-      <Profile user={user} />
+      <ThreadList threads={threads} className="mt-4" />
     </aside>
   )
 }
