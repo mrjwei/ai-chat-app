@@ -16,6 +16,6 @@ export default async function Page({params}: {params: {id: string}}) {
   const systemMessages = await fetchSystemMessages(session.user.id!)
 
   return (
-    <ChatWindow thread={thread} userId={session.user.id!} systemMessages={systemMessages} />
+    <ChatWindow thread={thread} userId={session.user.id!} />
   )
 }
