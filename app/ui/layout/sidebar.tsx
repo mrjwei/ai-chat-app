@@ -1,7 +1,6 @@
 'use client'
 
 import {useEffect} from 'react'
-import {useShallow} from 'zustand/shallow'
 import {usePathname} from 'next/navigation'
 import clsx from "clsx"
 import ThreadList from "@/app/ui/layout/thread-list"
@@ -11,10 +10,8 @@ import {useMenuStore} from '@/app/lib/stores'
 export default function Sidebar({threads}: {threads: IThread[]}) {
   const pathname = usePathname()
 
-  const {isOpen, setIsOpen} = useMenuStore(useShallow((state) => ({
-    isOpen: state.isOpen,
-    setIsOpen: state.setIsOpen
-  })))
+  const isOpen = useMenuStore((state) => state.isOpen)
+  const setIsOpen = useMenuStore((state) => state.setIsOpen)
 
   useEffect(() => {
     if (isOpen) {

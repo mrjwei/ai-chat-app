@@ -1,19 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { useShallow } from "zustand/shallow"
 import clsx from "clsx"
 import { useVoiceStore } from "@/app/lib/stores"
 import Button from "@/app/ui/common/button"
 import Dropdown from "@/app/ui/common/dropdown"
 
 export default function VoiceSelect({ className }: { className?: string }) {
-  const { voiceIndex, changeVoiceIndex } = useVoiceStore(
-    useShallow((state) => ({
-      voiceIndex: state.voiceIndex,
-      changeVoiceIndex: state.changeVoiceIndex,
-    }))
-  )
+  const voiceIndex = useVoiceStore((state) => state.voiceIndex)
+  const changeVoiceIndex = useVoiceStore((state) => state.changeVoiceIndex)
 
   const [label, setLabel] = useState(
     `${window.speechSynthesis.getVoices()[voiceIndex]?.name} (${

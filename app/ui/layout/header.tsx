@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { Bars3Icon, XMarkIcon, PlusIcon } from "@heroicons/react/24/outline"
-import {useShallow} from 'zustand/shallow'
 import Button from '@/app/ui/common/button'
 import SystemMessageSelect from '@/app/ui/chat/system-message-select'
 import VoiceSelect from '@/app/ui/chat/voice-select'
@@ -11,12 +10,8 @@ import {useMenuStore} from '@/app/lib/stores'
 import Profile from "@/app/ui/layout/profile"
 
 export default function Header({systemMessages, user}: {systemMessages: ISystemMessage[] | undefined, user: IUser}) {
-  const {isOpen, setIsOpen} = useMenuStore(
-    useShallow((state) => ({
-      isOpen: state.isOpen,
-      setIsOpen:state.setIsOpen
-    }))
-  )
+  const isOpen = useMenuStore((state) => state.isOpen)
+  const setIsOpen = useMenuStore((state) => state.setIsOpen)
 
   const handleClick = () => {
     setIsOpen(!isOpen)

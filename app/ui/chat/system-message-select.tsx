@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useShallow } from "zustand/shallow"
 import clsx from "clsx"
 import { ISystemMessage } from "@/app/lib/types"
 import { useSystemMessageStore } from "@/app/lib/stores"
@@ -15,12 +14,7 @@ export default function SystemMessageSelect({
   messages?: ISystemMessage[]
   className?: string
 }) {
-  const { systemMessage, changeSystemMessage } = useSystemMessageStore(
-    useShallow((state) => ({
-      systemMessage: state.systemMessage,
-      changeSystemMessage: state.changeSystemMessage,
-    }))
-  )
+  const changeSystemMessage = useSystemMessageStore((state) => state.changeSystemMessage)
 
   const [label, setLabel] = useState(messages ? messages[0].label : "")
 

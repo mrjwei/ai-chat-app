@@ -1,6 +1,5 @@
 'use client'
 
-import {useShallow} from 'zustand/shallow'
 import clsx from "clsx"
 import {IMessage} from '@/app/lib/types'
 import Message from '@/app/ui/chat/message'
@@ -8,10 +7,8 @@ import { utter, cancelUtter } from "@/app/lib/utilities"
 import {useSpeakingMessageStore, useVoiceStore} from '@/app/lib/stores'
 
 export default function Thread({thread}: {thread: any}) {
-  const {speakingMessage, setSpeakingMessage} = useSpeakingMessageStore(useShallow((state) => ({
-    speakingMessage: state.speakingMessage,
-    setSpeakingMessage: state.setSpeakingMessage
-  })))
+  const speakingMessage = useSpeakingMessageStore((state) => state.speakingMessage)
+  const setSpeakingMessage = useSpeakingMessageStore((state) => state.setSpeakingMessage)
   const voiceIndex = useVoiceStore((state) => state.voiceIndex)
 
   const handleClick = (message: IMessage) => {
