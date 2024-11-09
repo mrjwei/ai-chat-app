@@ -20,13 +20,15 @@ export default function TextBox({ value, handleChange, handleSend }: {value: str
 
   return (
     <>
-      <textarea
-        ref={textareaRef}
-        className="block flex-1 min-w-40 lg:max-w-[40rem] p-2 rounded-md -translate-x-[7.5px] mr-1"
-        value={value}
-        onChange={(e) => handleChange(e.target.value)}
-        placeholder="Record or type your message..."
-      ></textarea>
+      <div className="flex-1 min-w-40 lg:max-w-[40rem] px-2">
+        <textarea
+          ref={textareaRef}
+          className="block w-full p-2 rounded-md"
+          value={value}
+          onChange={(e) => handleChange(e.target.value)}
+          placeholder="Record or type your message..."
+        ></textarea>
+      </div>
       <Button onClick={handleSend} className="!p-2">
         <ArrowUpCircleIcon className="w-8" />
       </Button>

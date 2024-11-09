@@ -35,7 +35,7 @@ export default function Recorder({
         onStop={handleTranscribe}
         mimeType="audio/wav"
       />
-      <div className="flex mr-1">
+      <div className="flex">
         {record ? (
           <Button onClick={handleStop} className="text-red-500 !p-2">
             <StopCircleIcon className="w-8" />
