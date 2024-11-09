@@ -12,17 +12,15 @@ export default function Dropdown({
   btnClassName,
   menuClassName,
   initialLabel,
-  labelClassName,
-  iconClassName,
+  hasChevron = true,
   children,
 }: {
   className?: string
   btnClassNameOnOpen?: string
   btnClassName?: string
   menuClassName?: string
-  labelClassName?: string
-  iconClassName?: string
-  initialLabel: string
+  initialLabel: string | React.ReactNode
+  hasChevron?: boolean
   children: ReactNode
 }) {
   const pathname = usePathname()
@@ -59,27 +57,27 @@ export default function Dropdown({
       <Button
         type="button"
         className={clsx(
-          `flex items-center justify-between px-4 py-1 rounded ${isMenuOpen && btnClassNameOnOpen}`,
+          `flex items-center justify-between p-1 rounded ${isMenuOpen && btnClassNameOnOpen}`,
           btnClassName
         )}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         ref={btnRef}
       >
         <span className={clsx(
-          "mr-1 whitespace-nowrap overflow-hidden text-ellipsis",
-          labelClassName
+          "whitespace-nowrap overflow-hidden text-ellipsis",
+          {
+            "mr-1": hasChevron
+          }
         )}>{initialLabel}</span>
-        {isMenuOpen ? (
+        {hasChevron && (isMenuOpen ? (
           <ChevronUpIcon className={clsx(
             "size-5",
-            iconClassName
           )} />
         ) : (
           <ChevronDownIcon className={clsx(
             "size-5",
-            iconClassName
           )} />
-        )}
+        ))}
       </Button>
       {isMenuOpen && (
         <ul

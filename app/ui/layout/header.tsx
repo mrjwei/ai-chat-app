@@ -18,21 +18,23 @@ export default function Header({systemMessages, user}: {systemMessages: ISystemM
   }
 
   return (
-    <header className="fixed top-0 w-full z-50 p-1 bg-white shadow flex justify-between">
-      <Button onClick={handleClick}>
+    <header className="fixed top-0 w-full z-50 px-4 py-1 bg-white shadow grid grid-cols-12 gap-2">
+      <Button onClick={handleClick} className="col-span-2 !p-0">
         {isOpen ? (
           <XMarkIcon className="w-6" />
         ) : (
           <Bars3Icon className="w-6" />
         )}
       </Button>
-      <div className="flex items-center">
-        <SystemMessageSelect messages={systemMessages} />
-        <VoiceSelect />
-        <Link href='/' className="px-4 py-2">
-          <PlusIcon className="w-6" />
-        </Link>
-        <Profile user={user} />
+      <div className="col-span-10 grid grid-cols-subgrid gap-2">
+        <SystemMessageSelect messages={systemMessages} className="col-span-4" />
+        <VoiceSelect className="col-span-4" />
+        <div className="col-span-2 grid grid-cols-6">
+          <Link href='/' className=" w-full flex items-center justify-center col-span-3 lg:col-span-2 lg:col-start-2">
+            <PlusIcon className="w-6" />
+          </Link>
+          <Profile user={user} className="col-span-3 lg:col-span-2" />
+        </div>
       </div>
     </header>
   )

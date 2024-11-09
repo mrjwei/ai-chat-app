@@ -39,10 +39,8 @@ export default function VoiceSelect({ className }: { className?: string }) {
         initialLabel={label}
         className="block text-neutral-600 rounded"
         btnClassNameOnOpen="bg-neutral-100"
-        btnClassName="w-44 lg:w-80"
+        btnClassName="w-full border-2"
         menuClassName="absolute top-full right-0 z-50 translate-y-2"
-        labelClassName="flex-[2_1_0%]"
-        iconClassName="flex-[1_0_0%]"
       >
         <>
           {window.speechSynthesis.getVoices().map((voice, i) => {

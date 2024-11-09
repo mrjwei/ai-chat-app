@@ -36,11 +36,9 @@ export default function SystemMessageSelect({
       <Dropdown
         initialLabel={label}
         className="block text-neutral-600 rounded z-50"
-        btnClassName="w-44 lg:w-80"
+        btnClassName="w-full border-2"
         btnClassNameOnOpen="bg-neutral-100"
         menuClassName="absolute top-full right-0 z-50 translate-y-2"
-        labelClassName="flex-[2_1_0%]"
-        iconClassName="flex-[1_0_0%]"
       >
         {messages === undefined ? (
           <>
